@@ -6,6 +6,7 @@ export interface AppState {
   theme: {
     colorPrimary: string
     colorPrimaryBg: string
+    colorLink: string
   }
 }
 const initialState: AppState = {
@@ -13,7 +14,8 @@ const initialState: AppState = {
   reFetch: false,
   theme: {
     colorPrimary: '#e28048',
-    colorPrimaryBg: '#e6f7ff'
+    colorPrimaryBg: '#e6f7ff',
+    colorLink: 'e28048'
   }
 }
 export const appSlice = createSlice({
