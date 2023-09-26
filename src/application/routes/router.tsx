@@ -1,6 +1,6 @@
 import React, { ReactNode, Suspense, useLayoutEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
-import { Home, NotFound } from '~/application/pages'
+import { NotFound, Login } from '~/application/pages'
 import Loading from '../components/shared/Loading'
 import ErrorBoundary from './errorBoundary'
 
@@ -16,9 +16,9 @@ const Router: React.FC = () => {
   return (
     <Wrapper>
       <ErrorBoundary>
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading isLoading={true} />}>
           <Routes>
-            <Route path='/' element={<Home />} />
+            <Route path='/' element={<Login />} />
             <Route path='*' element={<NotFound />} />
           </Routes>
         </Suspense>
