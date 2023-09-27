@@ -3,7 +3,7 @@ import React from 'react'
 
 const { Content } = Layout
 
-const Loading: React.FC<any> = () => {
+const Loading: React.FC = () => {
   return (
     <Content className='loading'>
       <Spin size='large' tip='Loading...' />
