@@ -188,8 +188,8 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <div className='main-content flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
-      <Space size='large' direction='vertical'>
+    <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
+      <Space size='large' direction='vertical' className='w-full'>
         <div className='flex flex-row justify-between items-center'>
           <Title level={3}>Tổng quan</Title>
           <Radio.Group value={size} onChange={handleFilterChange}>
