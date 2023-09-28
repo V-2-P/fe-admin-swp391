@@ -11,9 +11,9 @@ const CommonLayout: React.FC = () => {
   return (
     <Layout hasSider>
       <Sider />
-      <Layout className='site-layout' style={{ marginLeft: 200 }}>
+      <Layout className='site-layout' style={{ marginLeft: 225 }}>
         <Header />
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+        <Content style={{ margin: '24px 16px 0', overflow: 'initial', minHeight: 'calc(100vh - 158px)' }}>
           <Outlet />
         </Content>
         <Footer />

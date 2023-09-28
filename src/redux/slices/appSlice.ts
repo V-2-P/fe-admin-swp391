@@ -15,7 +15,7 @@ const initialState: AppState = {
   theme: {
     colorPrimary: '#e28048',
     colorPrimaryBg: '#e6f7ff',
-    colorLink: 'e28048'
+    colorLink: '#e28048'
   }
 }
 export const appSlice = createSlice({
