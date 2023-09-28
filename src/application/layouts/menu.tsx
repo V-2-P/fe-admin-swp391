@@ -31,7 +31,7 @@ const items: MenuItem[] = [
   ]),
 
   getItem('Quản lý khách hàng', 'sub2', <AppstoreOutlined />, [
-    getItem('Option 9', '9'),
+    getItem('Danh sách khách hàng', '9'),
     getItem('Option 10', '10'),
     getItem('Option 11', '11')
   ])
