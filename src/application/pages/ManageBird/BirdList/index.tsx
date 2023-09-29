@@ -6,6 +6,7 @@ import type { ColumnFilterItem, FilterConfirmProps } from 'antd/es/table/interfa
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatCurrencyVND } from '~/utils/numberUtils'
+import BirdDetail from '~/application/components/birdList/birdDetail'
 
 const { Title, Link } = Typography
 
@@ -191,6 +192,7 @@ const BirdList: React.FC = () => {
     value: category,
     text: category
   }))
+
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
@@ -320,12 +322,9 @@ const BirdList: React.FC = () => {
     {
       title: 'Action',
       key: 'action',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: (_, _record) => (
+      render: (_, record) => (
         <Space size='middle'>
-          <Link href='https://ant.design' target='_blank'>
-            Edit
-          </Link>
+          <BirdDetail id={record.id} />
           <Link type='danger' href='https://ant.design' target='_blank'>
             Delete
           </Link>
