@@ -80,10 +80,15 @@ const ImageContainer: React.FC = () => {
         message.error('Image must smaller than 2MB!')
       }
 
-      return false
+      return isJpgOrPng && isLt2M
     },
     showUploadList: false,
-    onChange: onChangeThumbnail
+    onChange: onChangeThumbnail,
+    customRequest: ({ onSuccess }) => {
+      setTimeout(() => {
+        onSuccess!('ok')
+      }, 0)
+    }
   }
 
   return (

@@ -5,7 +5,8 @@ import {
   ShopOutlined,
   DashboardOutlined,
   ProfileOutlined,
-  TeamOutlined
+  TeamOutlined,
+  UserOutlined
 } from '@ant-design/icons'
 import { Menu as AntMenu } from 'antd'
 import type { MenuProps } from 'antd'
@@ -29,7 +30,7 @@ function getItem(
 }
 const items: MenuItem[] = [
   getItem('Dashboard', '1', <DashboardOutlined />),
-
+  getItem('Thông tin cá nhân', '2', <UserOutlined />),
   getItem('Quản lý nông trại', 'sub1', <ShopOutlined />, [
     getItem('Danh sách chim', '5', <ProfileOutlined />),
     getItem('Thêm chim', '6', <PlusOutlined />),
