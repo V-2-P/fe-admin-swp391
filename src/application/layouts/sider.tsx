@@ -15,7 +15,7 @@ const Sider: React.FC = () => {
         top: 0,
         bottom: 0
       }}
-      width={225}
+      width={250}
       className='select-none !hidden lg:!block'
     >
       <div className='pt-4 pb-2 pl-6 flex items-center w-full'>

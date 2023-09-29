@@ -116,7 +116,7 @@ const Header: React.FC = () => {
       <Drawer
         style={{ background: '#001529' }}
         closeIcon={false}
-        width={225}
+        width={250}
         bodyStyle={{ padding: 0 }}
         placement='left'
         onClose={onClose}

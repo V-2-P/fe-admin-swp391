@@ -1,5 +1,12 @@
 import React from 'react'
-import { AppstoreOutlined, ShopOutlined, DashboardOutlined, ProfileOutlined } from '@ant-design/icons'
+import {
+  PlusOutlined,
+  AppstoreOutlined,
+  ShopOutlined,
+  DashboardOutlined,
+  ProfileOutlined,
+  TeamOutlined
+} from '@ant-design/icons'
 import { Menu as AntMenu } from 'antd'
 import type { MenuProps } from 'antd'
 
@@ -25,13 +32,13 @@ const items: MenuItem[] = [
 
   getItem('Quản lý nông trại', 'sub1', <ShopOutlined />, [
     getItem('Danh sách chim', '5', <ProfileOutlined />),
-    getItem('Option 6', '6'),
+    getItem('Thêm chim', '6', <PlusOutlined />),
     getItem('Option 7', '7'),
     getItem('Option 8', '8')
   ]),
 
   getItem('Quản lý khách hàng', 'sub2', <AppstoreOutlined />, [
-    getItem('Danh sách khách hàng', '9'),
+    getItem('Danh sách khách hàng', '9', <TeamOutlined />),
     getItem('Option 10', '10'),
     getItem('Option 11', '11')
   ])
