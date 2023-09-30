@@ -1,11 +1,10 @@
 import React, { useRef, useState } from 'react'
 import { Space, Typography, Button, Row, Col, Card, Table, Input } from 'antd'
-import { SearchOutlined } from '@ant-design/icons'
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
-import { formatCurrencyVND } from '~/utils/numberUtils'
 
 const { Title, Link } = Typography
 
@@ -14,8 +13,8 @@ interface DataType {
   name: string
   email: string
   status: string
-  spend: number
-  numberOfOrders: number
+  phone: string
+  createdAt: Date
 }
 
 type DataIndex = keyof DataType
@@ -25,93 +24,93 @@ const dataTable: DataType[] = [
     id: 1,
     name: 'Nguyễn Văn A',
     email: 'nguyenvana@example.com',
-    status: 'Active',
-    spend: 500,
-    numberOfOrders: 10
+    status: 'Hoạt động',
+    phone: '0123456789',
+    createdAt: new Date('2023-09-01')
   },
   {
     id: 2,
     name: 'Trần Thị B',
     email: 'tranthib@example.com',
-    status: 'Inactive',
-    spend: 250,
-    numberOfOrders: 5
+    status: 'Nghỉ phép',
+    phone: '0987654321',
+    createdAt: new Date('2023-08-15')
   },
   {
     id: 3,
     name: 'Lê Văn C',
     email: 'levanc@example.com',
-    status: 'Active',
-    spend: 800,
-    numberOfOrders: 15
+    status: 'Hoạt động',
+    phone: '0369852147',
+    createdAt: new Date('2023-07-20')
   },
   {
     id: 4,
     name: 'Phạm Thị D',
     email: 'phamthid@example.com',
-    status: 'Active',
-    spend: 300,
-    numberOfOrders: 8
+    status: 'Hoạt động',
+    phone: '0912345678',
+    createdAt: new Date('2023-06-10')
   },
   {
     id: 5,
     name: 'Hoàng Văn E',
     email: 'hoangvane@example.com',
-    status: 'Inactive',
-    spend: 150,
-    numberOfOrders: 3
+    status: 'Nghỉ phép',
+    phone: '0345678901',
+    createdAt: new Date('2023-05-05')
   },
   {
     id: 6,
-    name: 'Nguyễn Thị F',
-    email: 'nguyenthif@example.com',
-    status: 'Active',
-    spend: 700,
-    numberOfOrders: 12
+    name: 'Trần Văn F',
+    email: 'tranvanf@example.com',
+    status: 'Hoạt động',
+    phone: '0765432190',
+    createdAt: new Date('2023-04-15')
   },
   {
     id: 7,
-    name: 'Trần Văn G',
-    email: 'tranvang@example.com',
-    status: 'Inactive',
-    spend: 200,
-    numberOfOrders: 4
+    name: 'Nguyễn Thị G',
+    email: 'nguyenthig@example.com',
+    status: 'Nghỉ phép',
+    phone: '0598765432',
+    createdAt: new Date('2023-03-20')
   },
   {
     id: 8,
     name: 'Lê Thị H',
     email: 'lethih@example.com',
-    status: 'Active',
-    spend: 600,
-    numberOfOrders: 11
+    status: 'Hoạt động',
+    phone: '0876543210',
+    createdAt: new Date('2023-02-10')
   },
   {
     id: 9,
-    name: 'Phạm Văn I',
-    email: 'phamvani@example.com',
-    status: 'Active',
-    spend: 400,
-    numberOfOrders: 7
+    name: 'Vũ Văn I',
+    email: 'vuvani@example.com',
+    status: 'Hoạt động',
+    phone: '0654321098',
+    createdAt: new Date('2023-01-05')
   },
   {
     id: 10,
-    name: 'Hoàng Thị K',
-    email: 'hoangthik@example.com',
-    status: 'Inactive',
-    spend: 100,
-    numberOfOrders: 2
+    name: 'Nguyễn Văn J',
+    email: 'nguyenvanj@example.com',
+    status: 'Nghỉ phép',
+    phone: '0432109876',
+    createdAt: new Date('2022-12-20')
   },
   {
     id: 11,
-    name: 'Hoàng Thị t',
-    email: 'hoangthik@example.com',
-    status: 'Inactive',
-    spend: 100,
-    numberOfOrders: 2
+    name: 'Phan Thị K',
+    email: 'phanthik@example.com',
+    status: 'Hoạt động',
+    phone: '0765432109',
+    createdAt: new Date('2022-11-15')
   }
 ]
 
-const CustomerList: React.FC = () => {
+const StaffList: React.FC = () => {
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
@@ -201,38 +200,31 @@ const CustomerList: React.FC = () => {
   })
   const columns: ColumnsType<DataType> = [
     {
-      title: 'Customer',
+      title: 'Staff',
       dataIndex: 'name',
       ...getColumnSearchProps('name'),
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      width: '30%'
+      sorter: (a, b) => a.name.localeCompare(b.name)
     },
     {
       title: 'Email',
       dataIndex: 'email',
-      sorter: (a, b) => a.email.localeCompare(b.email),
-      width: '30%'
+      sorter: (a, b) => a.email.localeCompare(b.email)
+    },
+
+    {
+      title: 'SĐT',
+      dataIndex: 'phone',
+      sorter: (a, b) => a.phone.localeCompare(b.phone)
     },
     {
       title: 'Status',
       dataIndex: 'status',
-      sorter: (a, b) => a.status.localeCompare(b.status),
-      width: '12%'
+      sorter: (a, b) => a.status.localeCompare(b.status)
     },
     {
-      title: 'Order',
-      dataIndex: 'numberOfOrders',
-      sorter: (a, b) => a.numberOfOrders - b.numberOfOrders,
-      width: '10%'
-    },
-    {
-      title: 'Spend',
-      dataIndex: 'spend',
-      sorter: (a, b) => a.spend - b.spend,
-      render: (_, { spend }) => {
-        return formatCurrencyVND(spend)
-      },
-      width: '10%'
+      title: 'Phone',
+      dataIndex: 'phone',
+      sorter: (a, b) => a.phone.localeCompare(b.phone)
     },
     {
       title: 'Action',
@@ -258,7 +250,10 @@ const CustomerList: React.FC = () => {
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
         <div className='flex flex-row justify-between items-center'>
-          <Title level={3}>Danh sách khách hàng</Title>
+          <Title level={3}>Danh sách nhân viên</Title>
+          <Button type='primary' icon={<PlusOutlined />} shape='round' size='large'>
+            Thêm Nhân viên
+          </Button>
         </div>
         <Row>
           <Col span={24}>
@@ -279,4 +274,4 @@ const CustomerList: React.FC = () => {
   )
 }
 
-export default CustomerList
+export default StaffList
