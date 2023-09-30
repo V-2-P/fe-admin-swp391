@@ -1,6 +1,16 @@
 import React, { ReactNode, Suspense, useLayoutEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
-import { NotFound, Login, Dashboard, BirdList, CustomerList, AddBird, Profile, OrderList } from '~/application/pages'
+import {
+  NotFound,
+  Login,
+  Dashboard,
+  BirdList,
+  CustomerList,
+  AddBird,
+  Profile,
+  OrderList,
+  StaffList
+} from '~/application/pages'
 import Loading from '../components/shared/Loading'
 import ErrorBoundary from './errorBoundary'
 import CommonLayout from '../layouts/common'
@@ -27,6 +37,7 @@ const Router: React.FC = () => {
               <Route path='/addbird' element={<AddBird />} />
               <Route path='/profile' element={<Profile />} />
               <Route path='/orderlist' element={<OrderList />} />
+              <Route path='stafflist' element={<StaffList />} />
             </Route>
             <Route path='*' element={<NotFound />} />
           </Routes>
