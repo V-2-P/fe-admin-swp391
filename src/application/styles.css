@@ -5,13 +5,13 @@
 :root {
 }
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
+  -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera*/
 }
-.custom-step-content  .ant-steps-item-content{
-  width: 123px !important
+.custom-step-content .ant-steps-item-content {
+  width: 123px !important;
 }
