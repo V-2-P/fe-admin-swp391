@@ -6,8 +6,9 @@ import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
+import OrderDetail from '~/application/components/orderList/orderDetail'
 
-const { Title, Link } = Typography
+const { Title } = Typography
 
 interface DataType {
   id: string
@@ -220,12 +221,7 @@ const OrderList: React.FC = () => {
     {
       title: 'Action',
       key: 'action',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: (_, _record) => (
-        <Link href='https://ant.design' target='_blank'>
-          Xem
-        </Link>
-      ),
+      render: (_, record) => <OrderDetail id={record.id} />,
       width: '20%'
     }
   ]
