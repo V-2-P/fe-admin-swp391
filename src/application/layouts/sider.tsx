@@ -16,7 +16,7 @@ const Sider: React.FC = () => {
         bottom: 0
       }}
       width={250}
-      className='select-none !hidden lg:!block'
+      className='select-none !hidden lg:!block hide-scrollbar'
     >
       <div className='pt-4 pb-2 pl-6 flex items-center w-full'>
         <div className='w-12 h-12 rounded-full border-2 border-sky-600 flex items-center justify-center text-sky-800 font-bold text-lg'>
