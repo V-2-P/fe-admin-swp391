@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import Menu from './menu'
+import { Link } from 'react-router-dom'
 
 const { Title } = Typography
 const { useBreakpoint } = Grid
@@ -58,23 +59,23 @@ const notifications: MenuProps['items'] = [
 const profiles: MenuProps['items'] = [
   {
     label: (
-      <a href='https://www.antgroup.com'>
+      <Link to='/profile'>
         <Space>
           <UserOutlined className='!text-[24px]' />
-          Profile
+          Thông tin cá nhân
         </Space>
-      </a>
+      </Link>
     ),
     key: '0'
   },
   {
     label: (
-      <a href='https://www.antgroup.com'>
+      <Link to='/support'>
         <Space>
           <QuestionCircleOutlined className='!text-[24px]' />
-          Help
+          Giúp đỡ
         </Space>
-      </a>
+      </Link>
     ),
     key: '1'
   },
@@ -86,7 +87,7 @@ const profiles: MenuProps['items'] = [
       <a href='https://www.antgroup.com'>
         <Space>
           <LogoutOutlined className='!text-[24px]' />
-          Logout
+          Đăng xuất
         </Space>
       </a>
     ),

@@ -7,6 +7,7 @@ import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import BirdDetail from '~/application/components/birdList/birdDetail'
+import { useNavigate } from 'react-router-dom'
 
 const { Title, Link } = Typography
 
@@ -185,6 +186,7 @@ const dataTable: DataType[] = [
 ]
 
 const BirdList: React.FC = () => {
+  const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
@@ -340,7 +342,13 @@ const BirdList: React.FC = () => {
       <Space size='large' direction='vertical' className='w-full'>
         <div className='flex flex-row justify-between items-center'>
           <Title level={3}>Danh sách chim</Title>
-          <Button type='primary' icon={<PlusOutlined />} shape='round' size='large'>
+          <Button
+            onClick={() => navigate('/addbird')}
+            type='primary'
+            icon={<PlusOutlined />}
+            shape='round'
+            size='large'
+          >
             Thêm chim
           </Button>
         </div>
