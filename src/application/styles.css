@@ -12,6 +12,9 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera*/
 }
+.ant-drawer-body::-webkit-scrollbar {
+  display: none;
+}
 .custom-step-content .ant-steps-item-content {
   width: 123px !important;
 }
