@@ -7,6 +7,7 @@ import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import OrderDetail from '~/application/components/orderList/orderDetail'
+import { formatCurrencyVND } from '~/utils/numberUtils'
 
 const { Title } = Typography
 
@@ -201,11 +202,6 @@ const OrderList: React.FC = () => {
       sorter: (a, b) => a.customerName.localeCompare(b.customerName)
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      sorter: (a, b) => a.status.localeCompare(b.status)
-    },
-    {
       title: 'OrderDate',
       dataIndex: 'orderDate',
       sorter: (a, b) => a.orderDate.getTime() - b.orderDate.getTime(),
@@ -217,6 +213,13 @@ const OrderList: React.FC = () => {
       title: 'Status',
       dataIndex: 'status',
       sorter: (a, b) => a.status.localeCompare(b.status)
+    },
+    {
+      title: 'Total',
+      dataIndex: 'total',
+      sorter: (a, b) => a.total - b.total,
+      render: (_, record) => formatCurrencyVND(record.total),
+      align: 'right'
     },
     {
       title: 'Action',
