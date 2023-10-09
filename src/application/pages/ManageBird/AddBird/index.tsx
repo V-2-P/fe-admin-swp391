@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography, Row, Col, Card, Tabs, Form, Button, App } from 'antd'
+import { Typography, Row, Col, Card, Tabs, Form, Button, App, Space } from 'antd'
 import { SettingOutlined, FileImageOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import type { TabsProps } from 'antd'
 import GeneralContainer from '~/application/components/addBird/generalContainer'
@@ -58,40 +58,42 @@ const AddBird: React.FC = () => {
   }
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
-      <div className='flex flex-row justify-between items-center'>
-        <Title level={3}>Thêm Chim</Title>
-      </div>
-      <Row>
-        <Col span={24}>
-          <Card bordered={false}>
-            <Form
-              initialValues={{ age: 0, competitionAchievements: 0, quantity: 1 }}
-              name='basic'
-              labelCol={{ span: 8 }}
-              labelAlign='left'
-              wrapperCol={{ span: 16 }}
-              style={{ width: '100%' }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete='off'
-            >
-              <Tabs
-                size='large'
-                tabBarStyle={{ userSelect: 'none' }}
-                tabBarGutter={50}
-                indicatorSize={125}
-                defaultActiveKey='1'
-                items={items}
-              />
-              <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
-                <Button type='primary' htmlType='submit' className='w-full' size='large'>
-                  Submit
-                </Button>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </Row>
+      <Space size='large' direction='vertical' className='w-full'>
+        <div className='flex flex-row justify-between items-center'>
+          <Title level={3}>Thêm Chim</Title>
+        </div>
+        <Row>
+          <Col span={24}>
+            <Card bordered={false}>
+              <Form
+                initialValues={{ age: 0, competitionAchievements: 0, quantity: 1 }}
+                name='addbird'
+                labelCol={{ span: 8 }}
+                labelAlign='left'
+                wrapperCol={{ span: 16 }}
+                style={{ width: '100%' }}
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete='off'
+              >
+                <Tabs
+                  size='large'
+                  tabBarStyle={{ userSelect: 'none' }}
+                  tabBarGutter={50}
+                  indicatorSize={125}
+                  defaultActiveKey='1'
+                  items={items}
+                />
+                <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
+                  <Button type='primary' htmlType='submit' className='w-full' size='large'>
+                    Submit
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Card>
+          </Col>
+        </Row>
+      </Space>
     </div>
   )
 }

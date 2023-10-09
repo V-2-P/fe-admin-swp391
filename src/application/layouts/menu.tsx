@@ -7,7 +7,8 @@ import {
   ProfileOutlined,
   TeamOutlined,
   UserOutlined,
-  ContainerOutlined
+  ContainerOutlined,
+  CarOutlined
 } from '@ant-design/icons'
 import { Menu as AntMenu } from 'antd'
 import type { MenuProps } from 'antd'
@@ -38,7 +39,8 @@ const items: MenuItem[] = [
     getItem('Thêm chim', '/addbird', <PlusOutlined />)
   ]),
   getItem('Quản lý đơn đặt hàng', 'sub2', <AppstoreOutlined />, [
-    getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />)
+    getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
+    getItem('Giao hàng', '/delivery', <CarOutlined />)
   ]),
   getItem('Quản lý khách hàng', 'sub3', <AppstoreOutlined />, [
     getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)
