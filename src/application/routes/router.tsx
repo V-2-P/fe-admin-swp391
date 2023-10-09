@@ -9,7 +9,8 @@ import {
   AddBird,
   Profile,
   OrderList,
-  StaffList
+  StaffList,
+  Delivery
 } from '~/application/pages'
 import Loading from '../components/shared/Loading'
 import ErrorBoundary from './errorBoundary'
@@ -37,7 +38,8 @@ const Router: React.FC = () => {
               <Route path='/addbird' element={<AddBird />} />
               <Route path='/profile' element={<Profile />} />
               <Route path='/orderlist' element={<OrderList />} />
-              <Route path='stafflist' element={<StaffList />} />
+              <Route path='/stafflist' element={<StaffList />} />
+              <Route path='/delivery' element={<Delivery />} />
             </Route>
             <Route path='*' element={<NotFound />} />
           </Routes>
