@@ -6,8 +6,9 @@ import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatCurrencyVND } from '~/utils/numberUtils'
+import { useNavigate } from 'react-router-dom'
 
-const { Title, Link } = Typography
+const { Title } = Typography
 
 interface DataType {
   id: number
@@ -26,7 +27,7 @@ const dataTable: DataType[] = [
     name: 'Nguyễn Văn A',
     email: 'nguyenvana@example.com',
     status: 'Active',
-    spend: 500,
+    spend: 500000,
     numberOfOrders: 10
   },
   {
@@ -34,7 +35,7 @@ const dataTable: DataType[] = [
     name: 'Trần Thị B',
     email: 'tranthib@example.com',
     status: 'Inactive',
-    spend: 250,
+    spend: 250000,
     numberOfOrders: 5
   },
   {
@@ -42,7 +43,7 @@ const dataTable: DataType[] = [
     name: 'Lê Văn C',
     email: 'levanc@example.com',
     status: 'Active',
-    spend: 800,
+    spend: 800000,
     numberOfOrders: 15
   },
   {
@@ -50,7 +51,7 @@ const dataTable: DataType[] = [
     name: 'Phạm Thị D',
     email: 'phamthid@example.com',
     status: 'Active',
-    spend: 300,
+    spend: 300000,
     numberOfOrders: 8
   },
   {
@@ -58,7 +59,7 @@ const dataTable: DataType[] = [
     name: 'Hoàng Văn E',
     email: 'hoangvane@example.com',
     status: 'Inactive',
-    spend: 150,
+    spend: 150000,
     numberOfOrders: 3
   },
   {
@@ -66,7 +67,7 @@ const dataTable: DataType[] = [
     name: 'Nguyễn Thị F',
     email: 'nguyenthif@example.com',
     status: 'Active',
-    spend: 700,
+    spend: 700000,
     numberOfOrders: 12
   },
   {
@@ -74,7 +75,7 @@ const dataTable: DataType[] = [
     name: 'Trần Văn G',
     email: 'tranvang@example.com',
     status: 'Inactive',
-    spend: 200,
+    spend: 200000,
     numberOfOrders: 4
   },
   {
@@ -82,7 +83,7 @@ const dataTable: DataType[] = [
     name: 'Lê Thị H',
     email: 'lethih@example.com',
     status: 'Active',
-    spend: 600,
+    spend: 600000,
     numberOfOrders: 11
   },
   {
@@ -90,7 +91,7 @@ const dataTable: DataType[] = [
     name: 'Phạm Văn I',
     email: 'phamvani@example.com',
     status: 'Active',
-    spend: 400,
+    spend: 400000,
     numberOfOrders: 7
   },
   {
@@ -98,7 +99,7 @@ const dataTable: DataType[] = [
     name: 'Hoàng Thị K',
     email: 'hoangthik@example.com',
     status: 'Inactive',
-    spend: 100,
+    spend: 100000,
     numberOfOrders: 2
   },
   {
@@ -106,12 +107,13 @@ const dataTable: DataType[] = [
     name: 'Hoàng Thị t',
     email: 'hoangthik@example.com',
     status: 'Inactive',
-    spend: 100,
+    spend: 100000,
     numberOfOrders: 2
   }
 ]
 
 const CustomerList: React.FC = () => {
+  const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
@@ -205,7 +207,7 @@ const CustomerList: React.FC = () => {
       dataIndex: 'name',
       ...getColumnSearchProps('name'),
       sorter: (a, b) => a.name.localeCompare(b.name),
-      width: '30%'
+      width: '20%'
     },
     {
       title: 'Email',
@@ -223,7 +225,7 @@ const CustomerList: React.FC = () => {
       title: 'Order',
       dataIndex: 'numberOfOrders',
       sorter: (a, b) => a.numberOfOrders - b.numberOfOrders,
-      width: '10%'
+      width: '8%'
     },
     {
       title: 'Spend',
@@ -232,23 +234,32 @@ const CustomerList: React.FC = () => {
       render: (_, { spend }) => {
         return formatCurrencyVND(spend)
       },
-      width: '10%'
+      width: '15%'
     },
     {
       title: 'Action',
       key: 'action',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: (_, _record) => (
-        <Space size='middle'>
-          <Link href='https://ant.design' target='_blank'>
-            Xem
-          </Link>
-          <Link type='danger' href='https://ant.design' target='_blank'>
-            Khóa
-          </Link>
+      render: (_, record) => (
+        <Space size='middle' direction='vertical' className='!w-full'>
+          <Row>
+            <Button type='link'>Xem</Button>
+            <Button
+              type='link'
+              onClick={() => {
+                navigate(`/updatecustomer/${record.id}`)
+              }}
+            >
+              Cập nhật
+            </Button>
+          </Row>
+          <Row>
+            <Button type='link' danger>
+              Khóa
+            </Button>
+          </Row>
         </Space>
       ),
-      width: '20%'
+      width: '25%'
     }
   ]
   const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
