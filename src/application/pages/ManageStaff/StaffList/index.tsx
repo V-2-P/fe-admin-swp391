@@ -5,8 +5,9 @@ import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
-const { Title, Link } = Typography
+const { Title } = Typography
 
 interface DataType {
   id: number
@@ -111,6 +112,7 @@ const dataTable: DataType[] = [
 ]
 
 const StaffList: React.FC = () => {
+  const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
@@ -229,15 +231,24 @@ const StaffList: React.FC = () => {
     {
       title: 'Action',
       key: 'action',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: (_, _record) => (
-        <Space size='middle'>
-          <Link href='https://ant.design' target='_blank'>
-            Xem
-          </Link>
-          <Link type='danger' href='https://ant.design' target='_blank'>
-            Khóa
-          </Link>
+      render: (_, record) => (
+        <Space size='middle' direction='vertical' className='!w-full'>
+          <Row>
+            <Button type='link'>Xem</Button>
+            <Button
+              type='link'
+              onClick={() => {
+                navigate(`/updatecustomer/${record.id}`)
+              }}
+            >
+              Cập nhật
+            </Button>
+          </Row>
+          <Row>
+            <Button type='link' danger>
+              Khóa
+            </Button>
+          </Row>
         </Space>
       ),
       width: '20%'
