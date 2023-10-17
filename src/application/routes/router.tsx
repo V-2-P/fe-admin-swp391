@@ -12,7 +12,8 @@ import {
   StaffList,
   Delivery,
   FeedbackList,
-  UpdateCustomer
+  UpdateCustomer,
+  UpdateStaff
 } from '~/application/pages'
 import Loading from '../components/shared/Loading'
 import ErrorBoundary from './errorBoundary'
@@ -45,6 +46,8 @@ const Router: React.FC = () => {
               <Route path='/feedbacklist' element={<FeedbackList />} />
               <Route path='/updatecustomer' element={<UpdateCustomer />} />
               <Route path='/updatecustomer/:id' element={<UpdateCustomer />} />
+              <Route path='/updatestaff' element={<UpdateStaff />} />
+              <Route path='/updatestaff/:id' element={<UpdateStaff />} />
             </Route>
             <Route path='*' element={<NotFound />} />
           </Routes>

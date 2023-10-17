@@ -50,7 +50,8 @@ const items: MenuItem[] = [
     getItem('Cập nhật khách hàng', '/updatecustomer', <EditOutlined />)
   ]),
   getItem('Quản lý nhân viên', 'sub5', <AppstoreOutlined />, [
-    getItem('Danh sách nhân viên', '/stafflist', <TeamOutlined />)
+    getItem('Danh sách nhân viên', '/stafflist', <TeamOutlined />),
+    getItem('Cập nhật nhân viên', '/updatestaff', <EditOutlined />)
   ])
 ]
 
