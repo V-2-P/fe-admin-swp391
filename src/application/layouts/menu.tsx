@@ -9,7 +9,8 @@ import {
   UserOutlined,
   ContainerOutlined,
   CarOutlined,
-  CommentOutlined
+  CommentOutlined,
+  EditOutlined
 } from '@ant-design/icons'
 import { Menu as AntMenu } from 'antd'
 import type { MenuProps } from 'antd'
@@ -45,7 +46,8 @@ const items: MenuItem[] = [
     getItem('Giao hàng', '/delivery', <CarOutlined />)
   ]),
   getItem('Quản lý khách hàng', 'sub4', <AppstoreOutlined />, [
-    getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)
+    getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />),
+    getItem('Cập nhật khách hàng', '/updatecustomer', <EditOutlined />)
   ]),
   getItem('Quản lý nhân viên', 'sub5', <AppstoreOutlined />, [
     getItem('Danh sách nhân viên', '/stafflist', <TeamOutlined />)
@@ -76,9 +78,11 @@ const findSubmenuByPath = (items: any[], path: string): string => {
   return submenu ? submenu.key : ''
 }
 const Menu: React.FC = () => {
+  const regex = /\/.+\/.+/g
   const navigate = useNavigate()
   const location = useLocation()
-  const [openKeys, setOpenKeys] = useState([findSubmenuByPath(items, location.pathname)])
+  const cleanedPathname = regex.test(location.pathname) ? '/' + location.pathname.split('/')[1] : location.pathname
+  const [openKeys, setOpenKeys] = useState([findSubmenuByPath(items, cleanedPathname)])
 
   const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
     setOpenKeys(keys)
@@ -95,7 +99,7 @@ const Menu: React.FC = () => {
       mode='inline'
       openKeys={openKeys}
       onOpenChange={onOpenChange}
-      selectedKeys={[location.pathname]}
+      selectedKeys={[cleanedPathname]}
       items={items}
     />
   )
