@@ -39,6 +39,7 @@ const items: MenuItem[] = [
   getItem('Quản lý nông trại', 'sub1', <ShopOutlined />, [
     getItem('Danh sách chim', '/birdlist', <ProfileOutlined />),
     getItem('Danh sách loài chim', '/birdtypelist', <ProfileOutlined />),
+    getItem('Danh sách danh mục', '/categorylist', <ProfileOutlined />),
     getItem('Thêm chim', '/addbird', <PlusOutlined />)
   ]),
   getItem('Quản lý website', 'sub2', <ShopOutlined />, [getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />)]),

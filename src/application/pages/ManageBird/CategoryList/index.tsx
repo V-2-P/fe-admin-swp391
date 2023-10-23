@@ -1,76 +1,77 @@
-import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import React, { useRef, useState, useEffect } from 'react'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result, Form, App } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
-import type { ColumnFilterItem, FilterConfirmProps } from 'antd/es/table/interface'
+import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
-import { formatCurrencyVND } from '~/utils/numberUtils'
-import BirdDetail from '~/application/components/birdList/birdDetail'
-import { useNavigate } from 'react-router-dom'
 import useFetchData from '~/application/hooks/useFetchData'
+import { AddCategoryPayload, addCategoryAPI, deleteCategoryAPI } from '~/utils/api'
+import DeleteButton from '~/application/components/shared/DeleteButton'
 
-const { Title, Link } = Typography
+const { Title } = Typography
 
-type BirdImage = {
-  id: number
-  imageUrl: string
-}
-
-type Bird = {
-  createdAt: Date
-  updatedAt: Date
+interface DataType {
   id: number
   name: string
-  price: number
-  thumbnail: string
-  description: string
-  category: {
-    id: number
-    name: string
-  }
-  birdType: {
-    id: number
-    name: string
-  }
-  status: boolean
-  purebredLevel: string
-  competitionAchievements: number
-  age: string
-  gender: string
-  color: string
-  quantity: number
-  birdImages: BirdImage[]
 }
 
-type BirdIndex = keyof Bird
+type DataIndex = keyof DataType
 
-const BirdList: React.FC = () => {
-  const limit = 10
-  const page = 1
-  const [loading, error, response] = useFetchData(`/birds?page=${page}&limit=${limit}`)
-  const data: Bird[] = response ? response.data.birds : []
-  const navigate = useNavigate()
+const CategoryList: React.FC = () => {
+  const [loading, error, response] = useFetchData(`/category`)
+  const [data, setData] = useState<DataType[]>([])
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
-  const filterCategory: ColumnFilterItem[] = Array.from(new Set(data.map((item) => item.category.name))).map(
-    (category) => ({
-      value: category,
-      text: category
-    })
-  )
-  const filterBirdType: ColumnFilterItem[] = Array.from(new Set(data.map((item) => item.birdType.name))).map(
-    (birdtype) => ({
-      value: birdtype,
-      text: birdtype
-    })
-  )
+
+  const [addLoading, setAddLoading] = useState(false)
+  const [form] = Form.useForm()
+  const { notification, message } = App.useApp()
+
+  const onFinish = async (values: AddCategoryPayload) => {
+    setAddLoading(true)
+    const payload: AddCategoryPayload = {
+      name: values.name
+    }
+
+    try {
+      const response = await addCategoryAPI(payload)
+      setAddLoading(false)
+      if (response) {
+        notification.success({ message: 'Thêm danh mục thành công' })
+        form.resetFields()
+        setData((prevData) => [response.data, ...prevData])
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setAddLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
+  }
+
+  const onFinishFailed = (errorInfo: any) => {
+    for (let i = 0; i < errorInfo.errorFields.length; i++) {
+      message.error(errorInfo.errorFields[i].errors[0])
+      return
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    const response = await deleteCategoryAPI(id)
+    if (response) {
+      setData((prevData) => prevData.filter((bird) => bird.id !== id))
+      notification.success({ message: 'Xóa chim thành công' })
+    } else {
+      notification.error({ message: 'Sorry! Something went wrong. App server error' })
+    }
+  }
 
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: BirdIndex
+    dataIndex: DataIndex
   ) => {
     confirm()
     setSearchText(selectedKeys[0])
@@ -81,7 +82,7 @@ const BirdList: React.FC = () => {
     clearFilters()
     setSearchText('')
   }
-  const getColumnSearchProps = (dataIndex: BirdIndex): ColumnType<Bird> => ({
+  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<DataType> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -151,7 +152,7 @@ const BirdList: React.FC = () => {
         text
       )
   })
-  const columns: ColumnsType<Bird> = [
+  const columns: ColumnsType<DataType> = [
     {
       title: 'Tên',
       dataIndex: 'name',
@@ -159,68 +160,56 @@ const BirdList: React.FC = () => {
       sorter: (a, b) => a.name.localeCompare(b.name)
     },
     {
-      title: 'Danh mục',
-      dataIndex: 'category',
-      filters: filterCategory,
-      // filterMode: 'tree',
-      filterSearch: true,
-      onFilter: (value: any, record) => record.category.name.includes(value as string),
-      sorter: (a, b) => a.category.name.localeCompare(b.category.name),
-      render: (_, { category }) => category.name
-    },
-    {
-      title: 'Loài chim',
-      dataIndex: 'birdType',
-      filters: filterBirdType,
-      // filterMode: 'tree',
-      filterSearch: true,
-      onFilter: (value: any, record) => record.birdType.name.includes(value as string),
-      sorter: (a, b) => a.birdType.name.localeCompare(b.birdType.name),
-      render: (_, { birdType }) => birdType.name
-    },
-    {
-      title: 'Số lượng',
-      dataIndex: 'quantity',
-      sorter: (a, b) => a.quantity - b.quantity
-    },
-    {
-      title: 'Giá tiền',
-      dataIndex: 'price',
-      sorter: (a, b) => a.price - b.price,
-      render: (_, { price }) => {
-        return formatCurrencyVND(price)
-      }
-    },
-    {
       key: 'action',
-      render: (_, record) => (
-        <Space size='middle'>
-          <BirdDetail id={record.id} />
-          <Link type='danger' href='https://ant.design' target='_blank'>
-            Delete
-          </Link>
-        </Space>
-      )
+      render: (_, record) => <DeleteButton onDelete={() => handleDelete(record.id)} />
     }
   ]
-  const onChange: TableProps<Bird>['onChange'] = (pagination, filters, sorter, extra) => {
+  const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
   }
+
+  useEffect(() => {
+    if (!loading && !error) {
+      setData(response.data)
+    }
+  }, [loading, error, response])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
         <div className='flex flex-row justify-between items-center'>
-          <Title level={3}>Danh sách chim</Title>
-          <Button
-            onClick={() => navigate('/addbird')}
-            type='primary'
-            icon={<PlusOutlined />}
-            shape='round'
-            size='large'
-          >
-            Thêm chim
-          </Button>
+          <Title level={3}>Danh sách danh mục</Title>
         </div>
+        <Row>
+          <Col span={24}>
+            <Card bordered={false}>
+              <Form
+                name='addcategory'
+                labelCol={{ span: 8 }}
+                labelAlign='left'
+                wrapperCol={{ span: 16 }}
+                style={{ width: '100%' }}
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete='off'
+                form={form}
+              >
+                <Form.Item<AddCategoryPayload>
+                  label='Tên danh mục'
+                  name='name'
+                  rules={[{ required: true, message: 'Vui lòng nhập danh mục!' }]}
+                >
+                  <Input size='large' placeholder='Vui lòng nhập danh mục' />
+                </Form.Item>
+
+                <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
+                  <Button type='primary' loading={addLoading} htmlType='submit' className='w-full' size='large'>
+                    Thêm
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Card>
+          </Col>
+        </Row>
         <Row>
           <Col span={24}>
             <Card bordered={false}>
@@ -231,7 +220,8 @@ const BirdList: React.FC = () => {
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}
-                  pagination={{ pageSize: limit }}
+                  pagination={false}
+                  virtual
                   scroll={{ x: 800, y: 300 }}
                   dataSource={data}
                   onChange={onChange}
@@ -245,4 +235,4 @@ const BirdList: React.FC = () => {
   )
 }
 
-export default BirdList
+export default CategoryList

@@ -14,7 +14,8 @@ import {
   FeedbackList,
   UpdateCustomer,
   UpdateStaff,
-  BirdTypeList
+  BirdTypeList,
+  CategoryList
 } from '~/application/pages'
 import Loading from '../components/shared/Loading'
 import ErrorBoundary from './errorBoundary'
@@ -56,6 +57,7 @@ const Router: React.FC = () => {
                 <Route path='/updatestaff' element={<UpdateStaff />} />
                 <Route path='/updatestaff/:id' element={<UpdateStaff />} />
                 <Route path='/birdtypelist' element={<BirdTypeList />} />
+                <Route path='/categorylist' element={<CategoryList />} />
               </Route>
             </Route>
 
