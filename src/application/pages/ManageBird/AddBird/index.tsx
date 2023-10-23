@@ -1,15 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Typography, Row, Col, Card, Tabs, Form, Button, App, Space } from 'antd'
 import { SettingOutlined, FileImageOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import type { TabsProps } from 'antd'
 import GeneralContainer from '~/application/components/addBird/generalContainer'
 import ImageContainer from '~/application/components/addBird/imageContainter'
 import AtributeContainer from '~/application/components/addBird/atributeContainer'
+import { useAppDispatch } from '~/application/hooks/reduxHook'
+import { reFetchData } from '~/redux/slices'
+import { AddBirdPayload } from '~/utils/api/bird/types'
+import { addBirdAPI } from '~/utils/api'
 
 const { Title } = Typography
 
 const AddBird: React.FC = () => {
-  const { message } = App.useApp()
+  const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
+  const [form] = Form.useForm()
+  const { notification, message } = App.useApp()
   const items: TabsProps['items'] = [
     {
       forceRender: true,
@@ -45,12 +52,43 @@ const AddBird: React.FC = () => {
       children: <AtributeContainer />
     }
   ]
-  const onFinish = (values: any) => {
-    console.log('Success:', values)
+  const onFinish = async (values: AddBirdPayload) => {
+    setLoading(true)
+    const payload: AddBirdPayload = {
+      name: values.name,
+      price: values.price,
+      description: values.description,
+      categoryId: values.categoryId,
+      typeId: values.typeId,
+      status: true,
+      purebredLevel: values.purebredLevel,
+      competitionAchievements: values.competitionAchievements,
+      age: values.age,
+      quantity: values.quantity,
+      gender: values.gender,
+      color: values.color,
+
+      imageThumbnail: values.imageThumbnail,
+      imagesFile: values.imagesFile
+    }
+
+    try {
+      const response = await addBirdAPI(payload)
+      setLoading(false)
+      if (response) {
+        notification.success({ message: 'Thêm chim thành công' })
+        form.resetFields()
+        dispatch(reFetchData())
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
   }
 
   const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo)
     for (let i = 0; i < errorInfo.errorFields.length; i++) {
       message.error(errorInfo.errorFields[i].errors[0])
       return
@@ -85,7 +123,7 @@ const AddBird: React.FC = () => {
                   items={items}
                 />
                 <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
-                  <Button type='primary' htmlType='submit' className='w-full' size='large'>
+                  <Button type='primary' loading={loading} htmlType='submit' className='w-full' size='large'>
                     Submit
                   </Button>
                 </Form.Item>

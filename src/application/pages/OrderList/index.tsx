@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input } from 'antd'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
@@ -8,107 +8,60 @@ import type { InputRef } from 'antd'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import OrderDetail from '~/application/components/orderList/orderDetail'
 import { formatCurrencyVND } from '~/utils/numberUtils'
+import useFetchData from '~/application/hooks/useFetchData'
 
 const { Title } = Typography
 
-interface DataType {
-  id: string
-  customerName: string
-  orderDate: Date
-  status: string
-  total: number
+type Order = {
+  id: number
+  userId: number
+  fullName: string
+  phoneNumber: string
+  shippingAddress: string
+  note: string
+  totalMoney: number
+  totalPayment: number
+  discount: number
+  orderDate: string
+  status: 'pending' | 'completed' | 'cancelled' // Các trạng thái có thể thay đổi
+  paymentMethod: string
+  shippingMethod: string
+  shippingDate: string
+  trackingNumber: string
+  orderDetails: OrderDetail[]
 }
 
-type DataIndex = keyof DataType
+type OrderDetail = {
+  birdId: number
+  birdName: string
+  thumbnail: string
+  gender: 'male' | 'female' // Các giới tính có thể thay đổi
+  price: number
+  numberOfProducts: number
+}
 
-const dataTable: DataType[] = [
-  {
-    id: '#INV10001',
-    customerName: 'Khách hàng A',
-    orderDate: new Date('2023-09-29'),
-    status: 'Đã giao hàng',
-    total: 100.5
-  },
-  {
-    id: '#INV10002',
-    customerName: 'Khách hàng B',
-    orderDate: new Date('2023-09-28'),
-    status: 'Đang xử lý',
-    total: 75.0
-  },
-  {
-    id: '#INV10003',
-    customerName: 'Khách hàng C',
-    orderDate: new Date('2023-09-27'),
-    status: 'Đã hủy',
-    total: 50.25
-  },
-  {
-    id: '#INV10004',
-    customerName: 'Khách hàng D',
-    orderDate: new Date('2023-09-26'),
-    status: 'Đã giao hàng',
-    total: 125.75
-  },
-  {
-    id: '#INV10005',
-    customerName: 'Khách hàng E',
-    orderDate: new Date('2023-09-25'),
-    status: 'Đang xử lý',
-    total: 90.0
-  },
-  {
-    id: '#INV10006',
-    customerName: 'Khách hàng F',
-    orderDate: new Date('2023-09-24'),
-    status: 'Đã giao hàng',
-    total: 60.5
-  },
-  {
-    id: '#INV10007',
-    customerName: 'Khách hàng G',
-    orderDate: new Date('2023-09-23'),
-    status: 'Đang xử lý',
-    total: 55.25
-  },
-  {
-    id: '#INV10008',
-    customerName: 'Khách hàng H',
-    orderDate: new Date('2023-09-22'),
-    status: 'Đã giao hàng',
-    total: 80.0
-  },
-  {
-    id: '#INV10009',
-    customerName: 'Khách hàng I',
-    orderDate: new Date('2023-09-21'),
-    status: 'Đang xử lý',
-    total: 95.75
-  },
-  {
-    id: '#INV10010',
-    customerName: 'Khách hàng J',
-    orderDate: new Date('2023-09-20'),
-    status: 'Đã hủy',
-    total: 40.0
-  },
-  {
-    id: '#INV10011',
-    customerName: 'Khách hàng K',
-    orderDate: new Date('2023-09-19'),
-    status: 'Đang xử lý',
-    total: 70.25
-  }
-]
+type OrderResponse = {
+  orderResponses: Order[]
+  totalPages: number
+}
+
+type OrderIndex = keyof Order
 
 const OrderList: React.FC = () => {
+  const limit = 10
+  const page = 1
+  const [loading, error, response] = useFetchData(`/orders?page=${page}&limit=${limit}`)
+  const res: OrderResponse = response
+  const totalPages = res ? res.totalPages : 0
+  const data: Order[] = res ? res.orderResponses : []
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
+
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
+    dataIndex: OrderIndex
   ) => {
     confirm()
     setSearchText(selectedKeys[0])
@@ -119,7 +72,7 @@ const OrderList: React.FC = () => {
     clearFilters()
     setSearchText('')
   }
-  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<DataType> => ({
+  const getColumnSearchProps = (dataIndex: OrderIndex): ColumnType<Order> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -189,36 +142,36 @@ const OrderList: React.FC = () => {
         text
       )
   })
-  const columns: ColumnsType<DataType> = [
+  const columns: ColumnsType<Order> = [
     {
-      title: 'OrderId',
+      title: 'Mã đơn hàng',
       dataIndex: 'id',
-      sorter: (a, b) => a.id.localeCompare(b.id)
+      sorter: (a, b) => a.id - b.id
     },
     {
-      title: 'Customer',
-      dataIndex: 'customerName',
-      ...getColumnSearchProps('customerName'),
-      sorter: (a, b) => a.customerName.localeCompare(b.customerName)
+      title: 'Khách hàng',
+      dataIndex: 'fullName',
+      ...getColumnSearchProps('fullName'),
+      sorter: (a, b) => a.fullName.localeCompare(b.fullName)
     },
     {
       title: 'OrderDate',
       dataIndex: 'orderDate',
-      sorter: (a, b) => a.orderDate.getTime() - b.orderDate.getTime(),
+      sorter: (a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
       render: (_, { orderDate }) => {
-        return formatDateToDDMMYYYY(orderDate)
+        return formatDateToDDMMYYYY(new Date(orderDate))
       }
     },
     {
-      title: 'Status',
+      title: 'Trạng thái',
       dataIndex: 'status',
       sorter: (a, b) => a.status.localeCompare(b.status)
     },
     {
-      title: 'Total',
-      dataIndex: 'total',
-      sorter: (a, b) => a.total - b.total,
-      render: (_, record) => formatCurrencyVND(record.total),
+      title: 'Tổng tiền',
+      dataIndex: 'totalMoney',
+      sorter: (a, b) => a.totalMoney - b.totalMoney,
+      render: (_, record) => formatCurrencyVND(record.totalMoney),
       align: 'right'
     },
     {
@@ -228,7 +181,7 @@ const OrderList: React.FC = () => {
       width: '20%'
     }
   ]
-  const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
+  const onChange: TableProps<Order>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
   }
   return (
@@ -240,14 +193,19 @@ const OrderList: React.FC = () => {
         <Row>
           <Col span={24}>
             <Card bordered={false}>
-              <Table
-                style={{ minHeight: 300 }}
-                columns={columns}
-                pagination={{ pageSize: 10 }}
-                scroll={{ x: 800, y: 300 }}
-                dataSource={dataTable}
-                onChange={onChange}
-              />
+              {error ? (
+                <Result title='Failed to fetch' subTitle={error} status='error' />
+              ) : (
+                <Table
+                  loading={loading}
+                  style={{ minHeight: 300 }}
+                  columns={columns}
+                  pagination={{ pageSize: limit, total: totalPages }}
+                  scroll={{ x: 800, y: 300 }}
+                  dataSource={data}
+                  onChange={onChange}
+                />
+              )}
             </Card>
           </Col>
         </Row>

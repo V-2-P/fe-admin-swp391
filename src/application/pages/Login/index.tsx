@@ -1,17 +1,39 @@
 import React from 'react'
-import { Form, Input, Button, Typography, Divider, Space, Image } from 'antd'
+import { Form, Input, Button, Typography, Divider, Space, Image, App } from 'antd'
 import { UserOutlined, LockOutlined, FacebookFilled, GoogleSquareFilled } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '~/application/hooks/reduxHook'
+import { loginAsync } from '~/redux/slices/accountSlice'
+import { LoginPayload } from '~/utils/api'
 const { Title } = Typography
 
-interface Values {
-  username: string
-  password: string
-}
-
 const LoginPage: React.FC = () => {
-  const onFinish = (values: Values) => {
-    console.log('Received values of form: ', values)
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const [form] = Form.useForm()
+  const { notification, message } = App.useApp()
+  const { isLoading } = useAppSelector((state) => state.account)
+  const onFinish = async (values: LoginPayload) => {
+    try {
+      const payload: LoginPayload = {
+        email: values.email,
+        password: values.password
+      }
+      await dispatch(loginAsync(payload)).unwrap()
+      form.resetFields()
+      notification.success({ message: `Chào mừng bạn đến với BFS` })
+      navigate('/dashboard')
+    } catch (err) {
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
+  }
+
+  const onFinishFailed = (errorInfo: any) => {
+    console.log('Failed:', errorInfo)
+    for (let i = 0; i < errorInfo.errorFields.length; i++) {
+      message.error(errorInfo.errorFields[i].errors[0])
+      return
+    }
   }
 
   return (
@@ -28,18 +50,17 @@ const LoginPage: React.FC = () => {
           <Title level={2}>Bird Farm Shop</Title>
         </div>
 
-        <Form name='login_form' onFinish={onFinish}>
-          <Form.Item name='username' rules={[{ required: true, message: 'Please input your Username!' }]}>
-            <Input prefix={<UserOutlined />} placeholder='Username' />
+        <Form name='login_form' form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+          <Form.Item<LoginPayload> name='email' rules={[{ required: true, message: 'Please input your Username!' }]}>
+            <Input prefix={<UserOutlined />} placeholder='Email' />
           </Form.Item>
-          <Form.Item name='password' rules={[{ required: true, message: 'Please input your Password!' }]}>
-            <Input prefix={<LockOutlined />} type='password' placeholder='Password' />
-
-            <Link className='float-right mt-2' to='https://ant.design'>
-              Forgot password
-            </Link>
+          <Form.Item<LoginPayload> name='password' rules={[{ required: true, message: 'Please input your Password!' }]}>
+            <Input.Password prefix={<LockOutlined />} type='password' placeholder='Password' />
           </Form.Item>
 
+          <Link className='float-right mt-2' to='https://ant.design'>
+            Forgot password
+          </Link>
           <Divider plain>or</Divider>
           <Form.Item>
             <div className='flex items-center justify-center'>
@@ -50,7 +71,7 @@ const LoginPage: React.FC = () => {
             </div>
           </Form.Item>
           <Form.Item>
-            <Button type='primary' htmlType='submit' block>
+            <Button type='primary' loading={isLoading} htmlType='submit' block>
               Log in
             </Button>
           </Form.Item>

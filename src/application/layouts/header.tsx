@@ -11,6 +11,8 @@ import {
 import type { MenuProps } from 'antd'
 import Menu from './menu'
 import { Link } from 'react-router-dom'
+import { useAppDispatch } from '../hooks/reduxHook'
+import { logout } from '~/redux/slices'
 
 const { Title } = Typography
 const { useBreakpoint } = Grid
@@ -56,51 +58,52 @@ const notifications: MenuProps['items'] = [
     key: '3'
   }
 ]
-const profiles: MenuProps['items'] = [
-  {
-    label: (
-      <Link to='/profile'>
-        <Space>
-          <UserOutlined className='!text-[24px]' />
-          Thông tin cá nhân
-        </Space>
-      </Link>
-    ),
-    key: '0'
-  },
-  {
-    label: (
-      <Link to='/support'>
-        <Space>
-          <QuestionCircleOutlined className='!text-[24px]' />
-          Giúp đỡ
-        </Space>
-      </Link>
-    ),
-    key: '1'
-  },
-  {
-    type: 'divider'
-  },
-  {
-    label: (
-      <a href='https://www.antgroup.com'>
-        <Space>
-          <LogoutOutlined className='!text-[24px]' />
-          Đăng xuất
-        </Space>
-      </a>
-    ),
-    key: '3'
-  }
-]
+
 const Header: React.FC = () => {
   const screens = useBreakpoint()
+  const dispatch = useAppDispatch()
   const [collapsed, setCollapsed] = useState(false)
   const {
     token: { colorBgContainer }
   } = theme.useToken()
-
+  const profiles: MenuProps['items'] = [
+    {
+      label: (
+        <Link to='/profile'>
+          <Space>
+            <UserOutlined className='!text-[24px]' />
+            Thông tin cá nhân
+          </Space>
+        </Link>
+      ),
+      key: '0'
+    },
+    {
+      label: (
+        <Link to='/support'>
+          <Space>
+            <QuestionCircleOutlined className='!text-[24px]' />
+            Giúp đỡ
+          </Space>
+        </Link>
+      ),
+      key: '1'
+    },
+    {
+      type: 'divider'
+    },
+    {
+      label: (
+        <p onClick={() => dispatch(logout())}>
+          <Space>
+            <LogoutOutlined className='!text-[24px]' />
+            Đăng xuất
+          </Space>
+        </p>
+      ),
+      key: '3'
+    }
+  ]
   const onClose = () => {
     setCollapsed(false)
   }
