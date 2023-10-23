@@ -3,7 +3,7 @@ import { Form, Upload, App } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import type { UploadFile, UploadProps } from 'antd'
 import { RcFile, UploadChangeParam } from 'antd/es/upload'
-import { AddBirdFieldType } from './type'
+import { AddBirdPayload } from '~/utils/api/bird/types'
 import { getBase64 } from '~/utils/imageUtils'
 
 const ImageContainer: React.FC = () => {
@@ -26,7 +26,8 @@ const ImageContainer: React.FC = () => {
     setFileImages(newFileList)
   }
   const onChangeThumbnail: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
-    getBase64(info.file as RcFile, (url) => {
+    console.log(info)
+    getBase64(info.file.originFileObj as RcFile, (url) => {
       setImageUrl(url)
     })
   }
@@ -93,8 +94,8 @@ const ImageContainer: React.FC = () => {
 
   return (
     <>
-      <Form.Item<AddBirdFieldType> label='Hình ảnh'>
-        <Form.Item name='images' valuePropName='fileImages' getValueFromEvent={normFile1} noStyle>
+      <Form.Item<AddBirdPayload> label='Hình ảnh'>
+        <Form.Item name='imagesFile' valuePropName='fileImages' getValueFromEvent={normFile1} noStyle>
           <Upload {...uploadImagesProps}>
             {fileImages.length === 0 ? (
               <>
@@ -110,16 +111,20 @@ const ImageContainer: React.FC = () => {
           </Upload>
         </Form.Item>
       </Form.Item>
-      <Form.Item label='Ảnh nhỏ' name='thumbnail' rules={[{ required: true, message: 'Please select thumbnail!' }]}>
-        <Form.Item<AddBirdFieldType>
-          name='thumbnail'
+      <Form.Item
+        label='Ảnh nhỏ'
+        name='imageThumbnail'
+        rules={[{ required: true, message: 'Please select thumbnail!' }]}
+      >
+        <Form.Item<AddBirdPayload>
+          name='imageThumbnail'
           valuePropName='fileThumbnail'
           getValueFromEvent={normFile2}
           noStyle
         >
           <Upload {...uploadThumbnailProps}>
             {imageUrl ? (
-              <img src={imageUrl} alt='thumbnail' style={{ width: '100%' }} />
+              <img src={imageUrl} alt='imageThumbnail' style={{ width: '100%' }} />
             ) : (
               <>
                 <p className='ant-upload-drag-icon'>
