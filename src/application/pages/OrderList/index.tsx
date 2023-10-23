@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result, Tag } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
@@ -9,6 +9,8 @@ import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import OrderDetail from '~/application/components/orderList/orderDetail'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import useFetchData from '~/application/hooks/useFetchData'
+import { getOrderStatus } from '~/utils/statusUtils'
+import { useSearchParams } from 'react-router-dom'
 
 const { Title } = Typography
 
@@ -23,7 +25,7 @@ type Order = {
   totalPayment: number
   discount: number
   orderDate: string
-  status: 'pending' | 'completed' | 'cancelled' // Các trạng thái có thể thay đổi
+  status: string
   paymentMethod: string
   shippingMethod: string
   shippingDate: string
@@ -40,20 +42,26 @@ type OrderDetail = {
   numberOfProducts: number
 }
 
-type OrderResponse = {
-  orderResponses: Order[]
-  totalPages: number
-}
+type OrderResponse = [
+  loading: boolean,
+  error: any,
+  response: {
+    data: {
+      orderResponses: Order[]
+      totalPages: number
+    }
+  }
+]
 
 type OrderIndex = keyof Order
 
 const OrderList: React.FC = () => {
-  const limit = 10
-  const page = 1
-  const [loading, error, response] = useFetchData(`/orders?page=${page}&limit=${limit}`)
-  const res: OrderResponse = response
-  const totalPages = res ? res.totalPages : 0
-  const data: Order[] = res ? res.orderResponses : []
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
+  const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
+  const [loading, error, response] = useFetchData(`/orders?page=${page - 1}&limit=${limit}`) as OrderResponse
+  const totalPages = response ? response.data.totalPages : 0
+  const data = response ? response.data.orderResponses : []
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
@@ -155,7 +163,7 @@ const OrderList: React.FC = () => {
       sorter: (a, b) => a.fullName.localeCompare(b.fullName)
     },
     {
-      title: 'OrderDate',
+      title: 'Ngày đặt',
       dataIndex: 'orderDate',
       sorter: (a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
       render: (_, { orderDate }) => {
@@ -165,7 +173,12 @@ const OrderList: React.FC = () => {
     {
       title: 'Trạng thái',
       dataIndex: 'status',
-      sorter: (a, b) => a.status.localeCompare(b.status)
+      sorter: (a, b) => a.status.localeCompare(b.status),
+      render: (_, record) => (
+        <Tag bordered={false} color={getOrderStatus(record.status).color}>
+          {getOrderStatus(record.status).name}
+        </Tag>
+      )
     },
     {
       title: 'Tổng tiền',
@@ -175,7 +188,6 @@ const OrderList: React.FC = () => {
       align: 'right'
     },
     {
-      title: 'Action',
       key: 'action',
       render: (_, record) => <OrderDetail id={record.id} />,
       width: '20%'
@@ -183,6 +195,8 @@ const OrderList: React.FC = () => {
   ]
   const onChange: TableProps<Order>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
+    const currentPage = pagination.current!
+    setSearchParams(`page=${currentPage}&limit=${limit}`)
   }
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
@@ -200,7 +214,7 @@ const OrderList: React.FC = () => {
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}
-                  pagination={{ pageSize: limit, total: totalPages }}
+                  pagination={{ pageSize: limit, total: totalPages * limit, current: page }}
                   scroll={{ x: 800, y: 300 }}
                   dataSource={data}
                   onChange={onChange}
