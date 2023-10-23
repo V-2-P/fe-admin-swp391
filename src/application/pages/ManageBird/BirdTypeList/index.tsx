@@ -1,14 +1,15 @@
-import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import React, { useRef, useState, useEffect } from 'react'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result, Form, App } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
-import { useNavigate } from 'react-router-dom'
 import useFetchData from '~/application/hooks/useFetchData'
+import { AddBirdTypePayload, addBirdTypeAPI, deleteBirdTypeAPI } from '~/utils/api'
+import DeleteButton from '~/application/components/shared/DeleteButton'
 
-const { Title, Link } = Typography
+const { Title } = Typography
 
 interface DataType {
   id: number
@@ -18,13 +19,54 @@ interface DataType {
 type DataIndex = keyof DataType
 
 const BirdTypeList: React.FC = () => {
-  const limit = 10
   const [loading, error, response] = useFetchData(`/birdtype`)
-  const data: DataType[] = response ? response.data : []
-  const navigate = useNavigate()
+  const [data, setData] = useState<DataType[]>([])
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
+
+  const [addLoading, setAddLoading] = useState(false)
+  const [form] = Form.useForm()
+  const { notification, message } = App.useApp()
+
+  const onFinish = async (values: AddBirdTypePayload) => {
+    setAddLoading(true)
+    const payload: AddBirdTypePayload = {
+      name: values.name
+    }
+
+    try {
+      const response = await addBirdTypeAPI(payload)
+      setAddLoading(false)
+      if (response) {
+        notification.success({ message: 'Thêm loài chim thành công' })
+        form.resetFields()
+        setData((prevData) => [response.data, ...prevData])
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setAddLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
+  }
+
+  const onFinishFailed = (errorInfo: any) => {
+    for (let i = 0; i < errorInfo.errorFields.length; i++) {
+      message.error(errorInfo.errorFields[i].errors[0])
+      return
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    const response = await deleteBirdTypeAPI(id)
+    if (response) {
+      setData((prevData) => prevData.filter((bird) => bird.id !== id))
+      notification.success({ message: 'Xóa chim thành công' })
+    } else {
+      notification.error({ message: 'Sorry! Something went wrong. App server error' })
+    }
+  }
 
   const handleSearch = (
     selectedKeys: string[],
@@ -119,37 +161,55 @@ const BirdTypeList: React.FC = () => {
     },
     {
       key: 'action',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: (_, _record) => (
-        <Space size='middle'>
-          <Link type='danger' href='https://ant.design' target='_blank'>
-            Update
-          </Link>
-          <Link type='danger' href='https://ant.design' target='_blank'>
-            Delete
-          </Link>
-        </Space>
-      )
+      render: (_, record) => <DeleteButton onDelete={() => handleDelete(record.id)} />
     }
   ]
   const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
   }
+
+  useEffect(() => {
+    if (!loading && !error) {
+      setData(response.data)
+    }
+  }, [loading, error, response])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
         <div className='flex flex-row justify-between items-center'>
           <Title level={3}>Danh sách loài chim</Title>
-          <Button
-            onClick={() => navigate('/addbirdtype')}
-            type='primary'
-            icon={<PlusOutlined />}
-            shape='round'
-            size='large'
-          >
-            Thêm loài chim
-          </Button>
         </div>
+        <Row>
+          <Col span={24}>
+            <Card bordered={false}>
+              <Form
+                name='addbirdtype'
+                labelCol={{ span: 8 }}
+                labelAlign='left'
+                wrapperCol={{ span: 16 }}
+                style={{ width: '100%' }}
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete='off'
+                form={form}
+              >
+                <Form.Item<AddBirdTypePayload>
+                  label='Tên loài chim'
+                  name='name'
+                  rules={[{ required: true, message: 'Vui lòng nhập tên loài chim!' }]}
+                >
+                  <Input size='large' placeholder='Vui lòng nhập tên loài chim' />
+                </Form.Item>
+
+                <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
+                  <Button type='primary' loading={addLoading} htmlType='submit' className='w-full' size='large'>
+                    Thêm
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Card>
+          </Col>
+        </Row>
         <Row>
           <Col span={24}>
             <Card bordered={false}>
@@ -160,7 +220,8 @@ const BirdTypeList: React.FC = () => {
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}
-                  pagination={{ pageSize: limit }}
+                  pagination={false}
+                  virtual
                   scroll={{ x: 800, y: 300 }}
                   dataSource={data}
                   onChange={onChange}
