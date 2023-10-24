@@ -7,7 +7,7 @@ import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import BirdDetail from '~/application/components/birdList/birdDetail'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import useFetchData from '~/application/hooks/useFetchData'
 
 const { Title, Link } = Typography
@@ -46,9 +46,11 @@ type Bird = {
 type BirdIndex = keyof Bird
 
 const BirdList: React.FC = () => {
-  const limit = 10
-  const page = 1
-  const [loading, error, response] = useFetchData(`/birds?page=${page}&limit=${limit}`)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
+  const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
+  const [loading, error, response] = useFetchData(`/birds?page=${page - 1}&limit=${limit}`)
+  const totalPages = response ? response.data.totalPages : 0
   const data: Bird[] = response ? response.data.birds : []
   const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
@@ -205,6 +207,8 @@ const BirdList: React.FC = () => {
   ]
   const onChange: TableProps<Bird>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
+    const currentPage = pagination.current!
+    setSearchParams(`page=${currentPage}&limit=${limit}`)
   }
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
@@ -231,7 +235,7 @@ const BirdList: React.FC = () => {
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}
-                  pagination={{ pageSize: limit }}
+                  pagination={{ pageSize: limit, total: totalPages * limit, current: page }}
                   scroll={{ x: 800, y: 300 }}
                   dataSource={data}
                   onChange={onChange}
