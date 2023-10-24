@@ -61,7 +61,7 @@ const OrderList: React.FC = () => {
   const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
   const [loading, error, response] = useFetchData(`/orders?page=${page - 1}&limit=${limit}`) as OrderResponse
   const totalPages = response ? response.data.totalPages : 0
-  const data = response ? response.data.orderResponses : []
+  const data: Order[] = response ? response.data.orderResponses : []
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)

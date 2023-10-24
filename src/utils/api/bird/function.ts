@@ -2,7 +2,7 @@ import axiosClient from '../AxiosClient'
 import { AddBirdPayload } from './types'
 
 const APIs_URL = {
-  BIRD: '/bird'
+  BIRD: '/birds'
 }
 
 export const addBirdAPI = async (data: AddBirdPayload) => {
