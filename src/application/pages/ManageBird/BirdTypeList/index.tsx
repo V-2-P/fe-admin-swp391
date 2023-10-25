@@ -62,7 +62,7 @@ const BirdTypeList: React.FC = () => {
     const response = await deleteBirdTypeAPI(id)
     if (response) {
       setData((prevData) => prevData.filter((bird) => bird.id !== id))
-      notification.success({ message: 'Xóa chim thành công' })
+      notification.success({ message: 'Xóa loài chim thành công' })
     } else {
       notification.error({ message: 'Sorry! Something went wrong. App server error' })
     }

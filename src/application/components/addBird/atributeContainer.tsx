@@ -4,7 +4,7 @@ import { Form, InputNumber, Result, Select, Skeleton } from 'antd'
 import { AddBirdPayload } from '~/utils/api/bird/types'
 import { formatCurrencyVNDToString, parseCurrencyVNDToNumber } from '~/utils/numberUtils'
 import useFetchData from '~/application/hooks/useFetchData'
-interface BirdType {
+export interface BirdType {
   id: number
   name: string
 }
