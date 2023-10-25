@@ -4,7 +4,7 @@ import { AddBirdPayload } from '~/utils/api/bird/types'
 import { formatCurrencyVNDToString, parseCurrencyVNDToNumber } from '~/utils/numberUtils'
 import useFetchData from '~/application/hooks/useFetchData'
 
-interface BirdCategory {
+export interface BirdCategory {
   id: number
   name: string
 }

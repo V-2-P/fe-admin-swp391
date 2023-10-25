@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
+import React, { useEffect, useRef, useState } from 'react'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result, App } from 'antd'
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { ColumnFilterItem, FilterConfirmProps } from 'antd/es/table/interface'
@@ -9,8 +9,10 @@ import { formatCurrencyVND } from '~/utils/numberUtils'
 import BirdDetail from '~/application/components/birdList/birdDetail'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import useFetchData from '~/application/hooks/useFetchData'
+import DeleteButton from '~/application/components/shared/DeleteButton'
+import { deleteBirdAPI } from '~/utils/api'
 
-const { Title, Link } = Typography
+const { Title } = Typography
 
 type BirdImage = {
   id: number
@@ -46,28 +48,39 @@ type Bird = {
 type BirdIndex = keyof Bird
 
 const BirdList: React.FC = () => {
+  const { notification } = App.useApp()
   const [searchParams, setSearchParams] = useSearchParams()
   const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
   const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
   const [loading, error, response] = useFetchData(`/birds?page=${page - 1}&limit=${limit}`)
+  const [data, setData] = useState<Bird[]>([])
   const totalPages = response ? response.data.totalPages : 0
-  const data: Bird[] = response ? response.data.birds : []
   const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
-  const filterCategory: ColumnFilterItem[] = Array.from(new Set(data.map((item) => item.category.name))).map(
-    (category) => ({
-      value: category,
-      text: category
-    })
-  )
-  const filterBirdType: ColumnFilterItem[] = Array.from(new Set(data.map((item) => item.birdType.name))).map(
-    (birdtype) => ({
-      value: birdtype,
-      text: birdtype
-    })
-  )
+  const filterCategory: ColumnFilterItem[] = response
+    ? Array.from(new Set(data.map((item) => item.category.name))).map((category) => ({
+        value: category,
+        text: category
+      }))
+    : []
+  const filterBirdType: ColumnFilterItem[] = response
+    ? Array.from(new Set(data.map((item) => item.birdType.name))).map((birdtype) => ({
+        value: birdtype,
+        text: birdtype
+      }))
+    : []
+
+  const handleDelete = async (id: number) => {
+    const response = await deleteBirdAPI(id)
+    if (response) {
+      setData((prevData) => prevData.filter((bird) => bird.id !== id))
+      notification.success({ message: 'Xóa chim thành công' })
+    } else {
+      notification.error({ message: 'Sorry! Something went wrong. App server error' })
+    }
+  }
 
   const handleSearch = (
     selectedKeys: string[],
@@ -198,9 +211,7 @@ const BirdList: React.FC = () => {
       render: (_, record) => (
         <Space size='middle'>
           <BirdDetail id={record.id} />
-          <Link type='danger' href='https://ant.design' target='_blank'>
-            Delete
-          </Link>
+          <DeleteButton onDelete={() => handleDelete(record.id)} />
         </Space>
       )
     }
@@ -210,6 +221,11 @@ const BirdList: React.FC = () => {
     const currentPage = pagination.current!
     setSearchParams(`page=${currentPage}&limit=${limit}`)
   }
+  useEffect(() => {
+    if (!loading && !error && response) {
+      setData(response.data.birds)
+    }
+  }, [loading, error, response])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
@@ -232,6 +248,7 @@ const BirdList: React.FC = () => {
                 <Result title='Failed to fetch' subTitle={error} status='error' />
               ) : (
                 <Table
+                  rowKey={'id'}
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}

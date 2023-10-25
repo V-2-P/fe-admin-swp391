@@ -16,3 +16,19 @@ export type AddBirdPayload = {
   imageThumbnail?: RcFile
   imagesFile?: RcFile[]
 }
+
+export type UpdateBirdPayload = {
+  name?: string
+  price?: number
+  description?: string
+  categoryId?: number
+  typeId?: number
+  status?: boolean
+  thumbnail?: string
+  purebredLevel?: string
+  competitionAchievements?: string
+  age?: string
+  quantity?: string
+  gender?: string
+  color?: string
+}
