@@ -8,7 +8,7 @@ import type { InputRef } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import useFetchData from '~/application/hooks/useFetchData'
 import DeleteButton from '~/application/components/shared/DeleteButton'
-import { deleteUserAPI } from '~/utils/api/user'
+import { deleteUserAPI } from '~/utils/api'
 
 const { Title } = Typography
 
