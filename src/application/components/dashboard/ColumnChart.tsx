@@ -1,24 +1,26 @@
 import React from 'react'
 
 import { Column, ColumnConfig } from '@ant-design/plots'
+import { WeeklyRevenueItem } from '~/utils/api'
+import { formatCurrencyVND } from '~/utils/numberUtils'
 
 type ColumnChartProp = {
-  data: any[]
+  data: WeeklyRevenueItem[]
 }
 
 const ColumnChart: React.FC<ColumnChartProp> = ({ data }) => {
   const config: ColumnConfig = {
     data,
     xField: 'day',
-    yField: 'money',
+    yField: 'totalPayment',
     tooltip: {
       // customContent: (title: string, data: any[]) => {
       //   return '1'
       // }
-      formatter: (datum: any) => {
+      formatter: (datum) => {
         return {
           name: 'Thu nhập',
-          value: datum.money.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+          value: formatCurrencyVND(datum.totalPayment)
         }
       }
     },

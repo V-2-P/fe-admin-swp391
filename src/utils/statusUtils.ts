@@ -1,25 +1,31 @@
 export const getStatusInfo = (status: string): { name: string; color: string } => {
   let result
   switch (status.toUpperCase()) {
-    case 'PROCESS':
+    case 'pending':
       result = {
         name: status.toUpperCase(),
         color: 'cyan'
       }
       break
-    case 'SHIPPING':
+    case 'processing':
+      result = {
+        name: status.toUpperCase(),
+        color: 'cyan'
+      }
+      break
+    case 'shipping':
       result = {
         name: status.toUpperCase(),
         color: 'gold'
       }
       break
-    case 'COMPLETE':
+    case 'delivered':
       result = {
         name: status.toUpperCase(),
         color: 'green'
       }
       break
-    case 'CANCELLED':
+    case 'cancelled':
       result = {
         name: status.toUpperCase(),
         color: 'volcano'

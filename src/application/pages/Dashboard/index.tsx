@@ -1,32 +1,32 @@
-import React, { useState } from 'react'
-import { Typography, Radio, Card, Statistic, Row, Col, Grid, Space, Table, Tag } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Typography, Radio, Card, Statistic, Row, Col, Grid, Space, Table, Tag, App, Result } from 'antd'
 import type { RadioChangeEvent } from 'antd'
-import { ArrowUpOutlined } from '@ant-design/icons'
 import ColumnChart from '~/application/components/dashboard/ColumnChart'
 import type { ColumnsType } from 'antd/es/table'
 import { getStatusInfo } from '~/utils/statusUtils'
-import { formatCurrencyVND } from '~/utils/numberUtils'
+import { formatCurrencyVND, formatCurrencyVNDToString } from '~/utils/numberUtils'
+import { RevenueData, getRevenueAPI } from '~/utils/api'
+import useFetchData from '~/application/hooks/useFetchData'
 
 const { Title } = Typography
 const { useBreakpoint } = Grid
 
 interface DataType {
-  key: string
-  name: string
+  userName: string
   amount: number
   status: string
-  invoice: string
+  invoive: number
 }
 
 const columns: ColumnsType<DataType> = [
   {
-    title: 'Billing',
-    dataIndex: 'name',
-    key: 'name',
+    title: 'Người đặt hàng',
+    dataIndex: 'userName',
+    key: 'userName',
     render: (text) => <a>{text}</a>
   },
   {
-    title: 'Amount',
+    title: 'Tổng tiền',
     dataIndex: 'amount',
     key: 'amount',
     render: (_, { amount }) => {
@@ -34,7 +34,7 @@ const columns: ColumnsType<DataType> = [
     }
   },
   {
-    title: 'Status',
+    title: 'Trạng thái',
     key: 'status',
     dataIndex: 'status',
     render: (_, { status }) => {
@@ -47,146 +47,82 @@ const columns: ColumnsType<DataType> = [
     }
   },
   {
-    title: 'Invoive',
-    dataIndex: 'invoice',
-    key: 'invoice'
+    title: 'Mã hóa đơn',
+    dataIndex: 'invoive',
+    key: 'invoive'
   }
 ]
 
-const dataTable: DataType[] = [
-  {
-    key: '1',
-    name: 'John Brown',
-    amount: 100000,
-    status: 'Process',
-    invoice: '#INV9834'
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    amount: 200000,
-    status: 'Shipping',
-    invoice: '#INV9834'
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    amount: 300000,
-    status: 'Complete',
-    invoice: '#INV9834'
-  },
-  {
-    key: '4',
-    name: 'Joe Red',
-    amount: 400000,
-    status: 'Cancelled',
-    invoice: '#INV9834'
-  },
-  {
-    key: '5',
-    name: 'Joe White',
-    amount: 500000,
-    status: 'Cancelled',
-    invoice: '#INV9834'
-  }
-]
-const data1 = [
-  {
-    day: 'Thứ 2',
-    money: 50000
-  },
-  {
-    day: 'Thứ 3',
-    money: 35000
-  },
-  {
-    day: 'Thứ 4',
-    money: 25000
-  },
-  {
-    day: 'Thứ 5',
-    money: 15000
-  },
-  {
-    day: 'Thứ 6',
-    money: 8500
-  },
-  {
-    day: 'Thứ 7',
-    money: 1500
-  },
-  {
-    day: 'Chủ nhật',
-    money: 3150
-  }
-]
-const data2 = [
-  {
-    day: 'Tháng 1',
-    money: 50000
-  },
-  {
-    day: 'Tháng 2',
-    money: 35000
-  },
-  {
-    day: 'Tháng 3',
-    money: 25000
-  },
-  {
-    day: 'Tháng 4',
-    money: 15000
-  },
-  {
-    day: 'Tháng 5',
-    money: 8500
-  },
-  {
-    day: 'Tháng 6',
-    money: 1500
-  },
-  {
-    day: 'Tháng 7',
-    money: 3150
-  },
-  {
-    day: 'Tháng 8',
-    money: 1250
-  },
-  {
-    day: 'Tháng 9',
-    money: 6050
-  },
-  {
-    day: 'Tháng 9',
-    money: 7211
-  },
-  {
-    day: 'Tháng 10',
-    money: 4200
-  },
-  {
-    day: 'Tháng 11',
-    money: 5500
-  },
-  {
-    day: 'Tháng 12',
-    money: 8500
-  }
-]
 const DashboardPage: React.FC = () => {
   const screens = useBreakpoint()
-  const [size, setSize] = useState<string>('daily')
-  const [data, setData] = useState(data1)
-  const handleFilterChange = (e: RadioChangeEvent) => {
+  const [bestSellerLoading, bestsellerError, bestsellerResponse] = useFetchData(`/dashboards/bestseller`)
+  const [orderLoading, orderError, orderResponse] = useFetchData(`/dashboards/order?page=0&limit=10`)
+  const [size, setSize] = useState<'daily' | 'month'>('daily')
+  const [data, setData] = useState<RevenueData>()
+  const { notification } = App.useApp()
+  const [loading, setLoading] = useState<boolean>(false)
+  const handleFilterChange = async (e: RadioChangeEvent) => {
     setSize(e.target.value)
-    if (data === data1) {
-      setData(data2)
-    } else {
-      setData(data1)
+    const search = e.target.value
+    console.log(e.target.value)
+    setLoading(true)
+    try {
+      const response = await getRevenueAPI(search)
+      setLoading(false)
+      if (response) {
+        const revenueData: RevenueData = response.data
+        if (search === 'daily') {
+          for (let i = 0; i < 6; i++) {
+            revenueData.weeklyRevenue[i].day = `Thứ ${i + 2}`
+          }
+          revenueData.weeklyRevenue[6].day = `Chủ nhật`
+        }
+        if (search === 'month') {
+          for (let i = 0; i < 12; i++) {
+            revenueData.weeklyRevenue[i].day = `Tháng ${i + 1}`
+          }
+        }
+        setData(revenueData)
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
     }
   }
 
+  useEffect(() => {
+    const getDashboard = async () => {
+      setLoading(true)
+      try {
+        const response = await getRevenueAPI(size)
+        setLoading(false)
+        if (response) {
+          const revenueData: RevenueData = response.data
+          if (size === 'daily') {
+            for (let i = 0; i < 6; i++) {
+              revenueData.weeklyRevenue[i].day = `Thứ ${i + 2}`
+            }
+            revenueData.weeklyRevenue[6].day = `Chủ nhật`
+          }
+          if (size === 'month') {
+            for (let i = 0; i < 12; i++) {
+              revenueData.weeklyRevenue[i].day = `Tháng ${i + 1}`
+            }
+          }
+          setData(revenueData)
+        } else {
+          notification.error({ message: 'Sorry! Something went wrong. App server error' })
+        }
+      } catch (err) {
+        setLoading(false)
+        notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+      }
+    }
+    getDashboard()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
@@ -194,101 +130,84 @@ const DashboardPage: React.FC = () => {
           <Title level={3}>Tổng quan</Title>
           <Radio.Group value={size} onChange={handleFilterChange}>
             <Radio.Button value='daily'>Daily</Radio.Button>
-            <Radio.Button value='monthly'>Monthly</Radio.Button>
+            <Radio.Button value='month'>Monthly</Radio.Button>
           </Radio.Group>
         </div>
         <Row gutter={[32, 32]}>
           <Col span={screens.lg ? 12 : 24}>
-            <Card bordered={false}>
-              <ColumnChart data={data} />
+            <Card bordered={false} loading={loading}>
+              <ColumnChart data={data ? data.weeklyRevenue : []} />
             </Card>
           </Col>
           <Col span={screens.lg ? 12 : 24}>
             <Row gutter={[32, 32]}>
               <Col span={12}>
-                <Card bordered={false}>
+                <Card bordered={false} loading={loading}>
+                  <Statistic title='Tổng đơn hàng' value={data ? data.totalOrders : 0} suffix='đơn' />
+                </Card>
+              </Col>
+              <Col span={12}>
+                <Card bordered={false} loading={loading}>
+                  <Statistic title='Tổng đơn lai chim' value={data ? data.totalBookings : 0} suffix='đơn' />
+                </Card>
+              </Col>
+              <Col span={12}>
+                <Card bordered={false} loading={loading}>
+                  <Statistic title='Số lượng khách hàng' value={data ? data.totalCustomerUsers : 0} suffix='người' />
+                </Card>
+              </Col>
+              <Col span={12}>
+                <Card bordered={false} loading={loading}>
                   <Statistic
-                    title='Lợi nhuận'
-                    value={11.28}
-                    precision={2}
-                    valueStyle={{ color: '#3f8600' }}
-                    prefix={<ArrowUpOutlined />}
-                    suffix='%'
+                    title='Tổng doanh thu'
+                    formatter={(value) => formatCurrencyVNDToString(value as number)}
+                    value={data ? data.totalRevenue : 0}
+                    suffix='VNĐ'
                   />
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card bordered={false}>
-                  <Statistic title='Tổng đơn hàng' value={1000} />
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card bordered={false}>
-                  <Statistic title='Tổng ghép chim' value={2150} />
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card bordered={false}>
-                  <Statistic title='Số lượng tài khoản' value={4000} />
                 </Card>
               </Col>
             </Row>
           </Col>
         </Row>
         <Row gutter={[32, 32]}>
-          <Col span={8}>
-            <Card>
+          <Col span={screens.lg ? 8 : 24}>
+            <Card loading={bestSellerLoading}>
               <Card.Meta
                 title='Bestseller'
                 description={
-                  <div>
-                    <div className='flex flex-col gap-1 py-2'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center'>Chim cu</div>
-                        <span>16,050</span>
-                      </div>
+                  bestsellerError ? (
+                    <Result title='Failed to fetch' subTitle={bestsellerError} status='error' />
+                  ) : (
+                    <div>
+                      {bestsellerResponse &&
+                        bestsellerResponse.data.map((item: { birdName: string; totalSold: number }) => (
+                          <div className='flex flex-col gap-1 py-2'>
+                            <div className='flex items-center justify-between'>
+                              <div className='flex items-center'>{item.birdName}</div>
+                              <span>{item.totalSold}</span>
+                            </div>
+                          </div>
+                        ))}
                     </div>
-                    <div className='flex flex-col gap-1 py-2'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center'>Chim cu</div>
-                        <span>16,050</span>
-                      </div>
-                    </div>
-                    <div className='flex flex-col gap-1 py-2'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center'>Chim cu</div>
-                        <span>16,050</span>
-                      </div>
-                    </div>
-                    <div className='flex flex-col gap-1 py-2'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center'>Chim cu</div>
-                        <span>16,050</span>
-                      </div>
-                    </div>
-                    <div className='flex flex-col gap-1 py-2'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center'>Chim cu</div>
-                        <span>16,050</span>
-                      </div>
-                    </div>
-                  </div>
+                  )
                 }
               />
             </Card>
           </Col>
-          <Col span={16}>
-            <Card>
+          <Col span={screens.lg ? 16 : 24}>
+            <Card loading={orderLoading}>
               <Card.Meta
-                title='Latest Order'
+                title='Đơn hàng gần nhất'
                 description={
-                  <Table
-                    pagination={{
-                      pageSize: 4
-                    }}
-                    columns={columns}
-                    dataSource={dataTable}
-                  />
+                  orderError ? (
+                    <Result title='Failed to fetch' subTitle={orderError} status='error' />
+                  ) : (
+                    <Table
+                      pagination={false}
+                      columns={columns}
+                      dataSource={orderResponse ? orderResponse.data.orderResponses : []}
+                    />
+                  )
                 }
               />
             </Card>
