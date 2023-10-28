@@ -5,7 +5,7 @@ import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import useFetchData from '~/application/hooks/useFetchData'
 import DeleteButton from '~/application/components/shared/DeleteButton'
 import { deleteUserAPI } from '~/utils/api'
@@ -34,8 +34,12 @@ type StaffIndex = keyof Staff
 
 const StaffList: React.FC = () => {
   const { notification } = App.useApp()
-  const [loading, error, response] = useFetchData(`/users/role/3`)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
+  const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
+  const [loading, error, response] = useFetchData(`/users?roleId=3&page=${page - 1}&limit=${limit}`)
   const [data, setData] = useState<Staff[]>([])
+  const totalPages = response ? response.data.totalPages : 0
   const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
@@ -44,8 +48,8 @@ const StaffList: React.FC = () => {
   const handleDelete = async (id: number) => {
     const response = await deleteUserAPI(id)
     if (response) {
-      setData((prevData) => prevData.filter((bird) => bird.id !== id))
-      notification.success({ message: 'Xóa chim thành công' })
+      setData((prevData) => prevData.filter((staff) => staff.id !== id))
+      notification.success({ message: 'Xóa nhân viên thành công' })
     } else {
       notification.error({ message: 'Sorry! Something went wrong. App server error' })
     }
@@ -195,10 +199,12 @@ const StaffList: React.FC = () => {
   ]
   const onChange: TableProps<Staff>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
+    const currentPage = pagination.current!
+    setSearchParams(`page=${currentPage}&limit=${limit}`)
   }
   useEffect(() => {
     if (!loading && !error && response) {
-      setData(response.data)
+      setData(response.data.users)
     }
   }, [loading, error, response])
   return (
@@ -217,10 +223,11 @@ const StaffList: React.FC = () => {
                 <Result title='Failed to fetch' subTitle={error} status='error' />
               ) : (
                 <Table
+                  rowKey={'id'}
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}
-                  pagination={{ pageSize: 10 }}
+                  pagination={{ pageSize: limit, total: totalPages * limit, current: page }}
                   scroll={{ x: 800, y: 300 }}
                   dataSource={data}
                   onChange={onChange}
