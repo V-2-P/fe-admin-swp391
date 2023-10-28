@@ -7,8 +7,7 @@ import ImageContainer from '~/application/components/addBird/imageContainter'
 import AtributeContainer from '~/application/components/addBird/atributeContainer'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 import { reFetchData } from '~/redux/slices'
-import { AddBirdPayload } from '~/utils/api/bird/types'
-import { addBirdAPI } from '~/utils/api'
+import { addBirdAPI, AddBirdPayload } from '~/utils/api'
 
 const { Title } = Typography
 
