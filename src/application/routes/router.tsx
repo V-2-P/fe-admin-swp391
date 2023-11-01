@@ -12,7 +12,6 @@ import {
   StaffList,
   Delivery,
   FeedbackList,
-  UpdateCustomer,
   UpdateStaff,
   BirdTypeList,
   CategoryList,
@@ -53,8 +52,6 @@ const Router: React.FC = () => {
                 <Route path='/stafflist' element={<StaffList />} />
                 <Route path='/delivery' element={<Delivery />} />
                 <Route path='/feedbacklist' element={<FeedbackList />} />
-                <Route path='/updatecustomer' element={<UpdateCustomer />} />
-                <Route path='/updatecustomer/:id' element={<UpdateCustomer />} />
                 <Route path='/updatestaff' element={<UpdateStaff />} />
                 <Route path='/updatestaff/:id' element={<UpdateStaff />} />
                 <Route path='/birdtypelist' element={<BirdTypeList />} />

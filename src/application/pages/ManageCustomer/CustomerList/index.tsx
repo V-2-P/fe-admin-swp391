@@ -6,7 +6,6 @@ import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatCurrencyVND } from '~/utils/numberUtils'
-import { useNavigate } from 'react-router-dom'
 
 const { Title } = Typography
 
@@ -113,7 +112,6 @@ const dataTable: DataType[] = [
 ]
 
 const CustomerList: React.FC = () => {
-  const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
@@ -239,24 +237,13 @@ const CustomerList: React.FC = () => {
     {
       title: 'Action',
       key: 'action',
-      render: (_, record) => (
-        <Space size='middle' direction='vertical' className='!w-full'>
-          <Row>
-            <Button type='link'>Xem</Button>
-            <Button
-              type='link'
-              onClick={() => {
-                navigate(`/updatecustomer/${record.id}`)
-              }}
-            >
-              Cập nhật
-            </Button>
-          </Row>
-          <Row>
-            <Button type='link' danger>
-              Khóa
-            </Button>
-          </Row>
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      render: (_, _record) => (
+        <Space size='middle' direction='horizontal' className='!w-full'>
+          <Button type='link'>Xem</Button>
+          <Button type='link' danger>
+            Khóa
+          </Button>
         </Space>
       ),
       width: '25%'

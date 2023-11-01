@@ -48,8 +48,7 @@ const items: MenuItem[] = [
     getItem('Giao hàng', '/delivery', <CarOutlined />)
   ]),
   getItem('Quản lý khách hàng', 'sub4', <AppstoreOutlined />, [
-    getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />),
-    getItem('Cập nhật khách hàng', '/updatecustomer', <EditOutlined />)
+    getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)
   ]),
   getItem('Quản lý nhân viên', 'sub5', <AppstoreOutlined />, [
     getItem('Danh sách nhân viên', '/stafflist', <TeamOutlined />),
