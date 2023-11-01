@@ -1,23 +1,61 @@
-import React, { useEffect, useState } from 'react'
-import { Typography, Space, Row, Col, Card, Form, App, Input, Button, Skeleton } from 'antd'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Typography, Space, Row, Col, Card, Form, App, Input, Button, Skeleton, Select } from 'antd'
 import DebounceSelect, { OptionType } from '~/application/components/shared/DebounceSelect'
 import { UpdateStaffFieldType } from '~/application/components/updateStaff/type'
-import axiosClient from '~/utils/api/AxiosClient'
 import { useParams, useNavigate } from 'react-router-dom'
+import { UpdateUserPayload, getUserByIdAPI, searchUserAPI, updateUserAPI } from '~/utils/api'
+import { reFetchData } from '~/redux/slices'
+import { useAppDispatch } from '~/application/hooks/reduxHook'
 const { Title } = Typography
+
+type User = {
+  createdAt: string
+  updatedAt: string
+  id: number
+  fullName: string
+  phoneNumber: string
+  email: string
+  address: string
+  imageUrl: string
+  roleEntity: {
+    id: number
+    name: string
+  }
+  emailVerified: boolean
+  dob: string
+  isActive: number
+}
+
+type UserData = {
+  users: User[]
+  totalPages: number
+}
 
 const UpdateStaff: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { message } = App.useApp()
+  const dispatch = useAppDispatch()
+  const { message, notification } = App.useApp()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false)
   const [form] = Form.useForm<UpdateStaffFieldType>()
-  const fetchUserList = async (customerId: string): Promise<OptionType[]> => {
-    console.log('fetching customerId', customerId)
-    const res = (await axiosClient.get('https://randomuser.me/api/?results=5')) as any
-    return res.results.map((user: { login: { uuid: string } }) => ({
-      label: user.login.uuid,
-      value: user.login.uuid
+  const status = useMemo(
+    () => [
+      { value: '1', label: 'Hoạt động' },
+      { value: '0', label: 'Ngừng hoạt động' },
+      { value: '2', label: 'Nghỉ phép' }
+    ],
+    []
+  )
+  const fetchUserList = async (search: string): Promise<OptionType[]> => {
+    console.log('fetching search', search)
+
+    const response = await searchUserAPI(search)
+    console.log(response)
+    const data: UserData = response.data
+    return data.users.map((user) => ({
+      label: user.email,
+      value: user.id
     }))
   }
   const handleChangeData = (newValue: OptionType) => {
@@ -28,38 +66,64 @@ const UpdateStaff: React.FC = () => {
     }
   }
 
-  const onFinish = (values: UpdateStaffFieldType) => {
-    console.log('Success:', values)
-    values.customerId = values.inputCustomerId?.value
-    values.inputCustomerId = undefined
-    delete values.inputCustomerId
+  const onFinish = async (values: UpdateStaffFieldType) => {
+    setIsButtonLoading(true)
+    try {
+      const payload: UpdateUserPayload = {
+        fullName: values.name,
+        phoneNumber: values.phone,
+        address: values.address,
+        email: values.email,
+        isActive: values.isActive?.value
+      }
+      const response = await updateUserAPI(Number(id), payload)
+      setIsButtonLoading(false)
+      if (response) {
+        notification.success({ message: `Cập nhật nhân viên thành công` })
+        dispatch(reFetchData())
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setIsButtonLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
   }
 
   const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo)
     for (let i = 0; i < errorInfo.errorFields.length; i++) {
       message.error(errorInfo.errorFields[i].errors[0])
       return
     }
   }
   useEffect(() => {
-    if (id) {
+    const fetchUser = async (id: number) => {
       setIsLoading(true)
-      setTimeout(() => {
-        setIsLoading(false)
-        form.setFieldsValue({
-          customer: 'anh vu',
-          inputCustomerId: {
-            value: id,
-            label: id
-          },
-          email: 'vuthase172485@fpt.edu.vn'
-        })
-      }, 2000)
+      const res = await getUserByIdAPI(id)
+      const data: User = res.data
+      form.setFieldsValue({
+        name: data.fullName,
+        inputCustomerId: {
+          value: data.id.toString(),
+          label: data.email
+        },
+        phone: data.phoneNumber,
+        email: data.email,
+        address: data.address,
+        isActive: {
+          value: data.isActive.toString(),
+          label: status.find((e) => e.value === data.isActive.toString())?.label
+        }
+      })
+      setIsLoading(false)
+      console.log(res)
+    }
+    if (id) {
+      fetchUser(Number(id))
     } else {
       form.resetFields()
     }
-  }, [form, id])
+  }, [form, id, status])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
@@ -82,13 +146,13 @@ const UpdateStaff: React.FC = () => {
               >
                 <Skeleton loading={isLoading} active>
                   <Form.Item<UpdateStaffFieldType>
-                    label='Mã nhân viên'
+                    label='Tìm kiếm nhân viên'
                     name='inputCustomerId'
-                    rules={[{ required: true, message: 'Vui lòng chọn mã nhân viên!' }]}
+                    rules={[{ required: true, message: 'Vui lòng chọn nhân viên!' }]}
                   >
                     <DebounceSelect
                       showSearch
-                      placeholder='Chọn mã nhân viên'
+                      placeholder='Chọn nhân viên'
                       fetchOptions={fetchUserList}
                       onChange={(newValue) => handleChangeData(newValue as OptionType)}
                       size='large'
@@ -99,16 +163,29 @@ const UpdateStaff: React.FC = () => {
                   <Form.Item<UpdateStaffFieldType>
                     label='Email'
                     name='email'
-                    rules={[{ required: true, message: 'Vui lòng nhập Email!' }]}
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập Email!' },
+                      {
+                        type: 'email',
+                        message: 'The input is not valid E-mail!'
+                      }
+                    ]}
                   >
                     <Input size='large' placeholder='Vui lòng nhập Email' />
                   </Form.Item>
                   <Form.Item<UpdateStaffFieldType>
                     label='Tên nhân viên'
-                    name='customer'
+                    name='name'
                     rules={[{ required: true, message: 'Vui lòng nhập tên nhân viên!' }]}
                   >
                     <Input size='large' placeholder='Vui lòng nhập tên nhân viên' />
+                  </Form.Item>
+                  <Form.Item<UpdateStaffFieldType>
+                    label='Số điện thoại'
+                    name='phone'
+                    rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+                  >
+                    <Input size='large' placeholder='Vui lòng nhập số điện thoại' />
                   </Form.Item>
                   <Form.Item<UpdateStaffFieldType>
                     label='Địa chỉ'
@@ -116,6 +193,13 @@ const UpdateStaff: React.FC = () => {
                     rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
                   >
                     <Input size='large' placeholder='Vui lòng nhập địa chỉ' />
+                  </Form.Item>
+                  <Form.Item<UpdateStaffFieldType>
+                    name='isActive'
+                    label='Trạng thái'
+                    rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+                  >
+                    <Select placeholder='Chọn trạng thái' options={status} size='large' />
                   </Form.Item>
                   <Form.Item<UpdateStaffFieldType> label='Facebook' name='facebook'>
                     <Input size='large' placeholder='Nhập Facebook' />
@@ -125,7 +209,7 @@ const UpdateStaff: React.FC = () => {
                   </Form.Item>
                 </Skeleton>
                 <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
-                  <Button type='primary' htmlType='submit' className='w-full' size='large'>
+                  <Button type='primary' loading={isButtonLoading} htmlType='submit' className='w-full' size='large'>
                     Save
                   </Button>
                 </Form.Item>

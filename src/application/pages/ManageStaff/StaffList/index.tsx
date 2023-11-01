@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import useFetchData from '~/application/hooks/useFetchData'
 import DeleteButton from '~/application/components/shared/DeleteButton'
 import { deleteUserAPI } from '~/utils/api'
+import SatusButton from '~/application/components/staffList/statusButton'
 
 const { Title } = Typography
 
@@ -144,14 +145,12 @@ const StaffList: React.FC = () => {
       title: 'Nhân viên',
       dataIndex: 'fullName',
       ...getColumnSearchProps('fullName'),
-      sorter: (a, b) => a.fullName.localeCompare(b.fullName),
-      width: '20%'
+      sorter: (a, b) => a.fullName.localeCompare(b.fullName)
     },
     {
       title: 'Email',
       dataIndex: 'email',
-      sorter: (a, b) => a.email.localeCompare(b.email),
-      width: '30%'
+      sorter: (a, b) => a.email.localeCompare(b.email)
     },
 
     {
@@ -163,15 +162,7 @@ const StaffList: React.FC = () => {
       title: 'Trạng thái',
       dataIndex: 'isActive',
       sorter: (a, b) => a.isActive - b.isActive,
-      render: (_, record) => {
-        if (record.isActive === 1) {
-          return <p>Hoạt động</p>
-        } else if (record.isActive === 0) {
-          return <p>Nghỉ làm</p>
-        } else if (record.isActive === 2) {
-          return <p>Nghỉ phép</p>
-        }
-      }
+      render: (_, record) => <SatusButton status={record.isActive} id={record.id} />
     },
     {
       title: 'Action',
@@ -183,7 +174,7 @@ const StaffList: React.FC = () => {
             <Button
               type='link'
               onClick={() => {
-                navigate(`/updatecustomer/${record.id}`)
+                navigate(`/updatestaff/${record.id}`)
               }}
             >
               Cập nhật
@@ -193,8 +184,7 @@ const StaffList: React.FC = () => {
             <DeleteButton onDelete={() => handleDelete(record.id)} />
           </Row>
         </Space>
-      ),
-      width: '20%'
+      )
     }
   ]
   const onChange: TableProps<Staff>['onChange'] = (pagination, filters, sorter, extra) => {
