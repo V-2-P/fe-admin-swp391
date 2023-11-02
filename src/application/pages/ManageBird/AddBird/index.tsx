@@ -54,23 +54,26 @@ const AddBird: React.FC = () => {
   const onFinish = async (values: AddBirdPayload) => {
     setLoading(true)
     const payload: AddBirdPayload = {
-      name: values.name,
-      price: values.price,
-      description: values.description,
-      categoryId: values.categoryId,
-      typeId: values.typeId,
+      ...(values?.name && { name: values.name }),
+      ...(values?.price && { price: values.price }),
+      ...(values?.description && { description: values.description }),
+      ...(values?.categoryId && { categoryId: values.categoryId }),
+      ...(values?.typeId && { typeId: values.typeId }),
       status: true,
-      purebredLevel: values.purebredLevel,
+      ...(values?.purebredLevel && { purebredLevel: values.purebredLevel }),
       competitionAchievements: values.competitionAchievements,
-      age: values.age,
-      quantity: values.quantity,
-      gender: values.gender,
-      color: values.color,
-
-      imageThumbnail: values.imageThumbnail,
-      imagesFile: values.imagesFile
+      ...(values?.age && { age: values.age }),
+      ...(values?.quantity && { quantity: values.quantity }),
+      ...(values?.gender && { gender: values.gender }),
+      ...(values?.color && { color: values.color }),
+      ...(values?.imageThumbnail && { imageThumbnail: values.imageThumbnail.originFileObj }),
+      ...(values.imagesFile &&
+        values.imagesFile.length > 0 && {
+          imagesFile: values.imagesFile.map((image: any) => image.originFileObj)
+        })
     }
 
+    console.log(payload)
     try {
       const response = await addBirdAPI(payload)
       setLoading(false)
@@ -103,7 +106,7 @@ const AddBird: React.FC = () => {
           <Col span={24}>
             <Card bordered={false}>
               <Form
-                initialValues={{ age: 0, competitionAchievements: 0, quantity: 1 }}
+                initialValues={{ competitionAchievements: 0, quantity: 1 }}
                 name='addbird'
                 labelCol={{ span: 8 }}
                 labelAlign='left'
@@ -112,6 +115,7 @@ const AddBird: React.FC = () => {
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 autoComplete='off'
+                form={form}
               >
                 <Tabs
                   size='large'

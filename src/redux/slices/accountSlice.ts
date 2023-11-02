@@ -1,13 +1,15 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { LoginPayload, loginAPI } from '~/utils/api'
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { LoginPayload, LoginResponse, Role, loginAPI } from '~/utils/api'
 
 export interface AccountState {
   isLogin: boolean
   error: any
   isLoading: boolean
   accessToken?: string
+  refreshToken?: string
   userId?: number
-  role?: string
+  role?: Role
+  imageUrl?: string
 }
 
 export const loginAsync = createAsyncThunk('auth/signin', async (userData: LoginPayload, { rejectWithValue }) => {
@@ -29,21 +31,23 @@ export const accountSlice = createSlice({
   name: 'account',
   initialState,
   reducers: {
-    logout: (state) => {
-      state.isLogin = false
-      state.error = null
-      state.isLoading = false
-      localStorage.clear()
+    logout: () => {
+      return initialState
+    },
+    setAccessToken: (state, action: PayloadAction<string>) => {
+      state.accessToken = action.payload
     }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginAsync.fulfilled, (state, action) => {
+      .addCase(loginAsync.fulfilled, (state, action: PayloadAction<LoginResponse>) => {
         state.isLoading = false
         state.isLogin = true
         state.accessToken = action.payload.accessToken
+        state.refreshToken = action.payload.refreshToken
         state.userId = action.payload.userId
         state.role = action.payload.role
+        state.imageUrl = action.payload.imageUrl
       })
       .addCase(loginAsync.pending, (state) => {
         state.isLoading = true
@@ -59,6 +63,6 @@ export const accountSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { logout } = accountSlice.actions
+export const { logout, setAccessToken } = accountSlice.actions
 
 export const AccountReducer = accountSlice.reducer

@@ -1,4 +1,4 @@
-import { RcFile } from 'antd/es/upload'
+import { UploadFile } from 'antd/es/upload'
 
 export type AddBirdPayload = {
   name?: string
@@ -13,8 +13,8 @@ export type AddBirdPayload = {
   quantity?: number
   gender?: string
   color?: string
-  imageThumbnail?: RcFile
-  imagesFile?: RcFile[]
+  imageThumbnail?: UploadFile
+  imagesFile?: UploadFile[]
 }
 
 export type UpdateBirdPayload = {

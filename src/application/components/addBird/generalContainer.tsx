@@ -18,7 +18,11 @@ const GeneralContainer: React.FC = () => {
       }))
     : []
 
-  const genders = [{ value: 'male', label: 'Đực' }, { value: 'female', label: 'Cái' }, { value: 'Khác' }]
+  const genders = [
+    { value: 'Trống', label: 'Trống' },
+    { value: 'Mái', label: 'Mái' },
+    { value: 'Khác', label: 'Khác' }
+  ]
   return (
     <Skeleton loading={fetchCategoryLoading} active>
       {fetchCategoryError ? (
@@ -46,7 +50,7 @@ const GeneralContainer: React.FC = () => {
             name='age'
             rules={[{ required: true, message: 'Vui lòng nhập tuổi' }]}
           >
-            <InputNumber min={0} max={100} className='!w-full' size='large' />
+            <Input placeholder='Vui lòng nhập tuổi' className='!w-full' size='large' />
           </Form.Item>
 
           <Form.Item<AddBirdPayload>
@@ -69,6 +73,7 @@ const GeneralContainer: React.FC = () => {
               addonAfter='vnđ'
               className='!w-full'
               size='large'
+              placeholder='Giá tiền'
             />
           </Form.Item>
 
@@ -87,7 +92,7 @@ const GeneralContainer: React.FC = () => {
           </Form.Item>
 
           <Form.Item label='Mô tả' name='description'>
-            <Input.TextArea showCount maxLength={300} autoSize={{ minRows: 5 }} />
+            <Input.TextArea placeholder='Mô tả chim nếu có' showCount maxLength={300} autoSize={{ minRows: 5 }} />
           </Form.Item>
         </>
       )}

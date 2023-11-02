@@ -1,5 +1,6 @@
+import { convertToFormData } from '~/utils/formDataUtils'
 import axiosClient from '../AxiosClient'
-import { AddBirdPayload, UpdateBirdPayload } from './types'
+import { UpdateBirdPayload } from './types'
 
 const APIs_URL = {
   BIRD: '/birds',
@@ -8,13 +9,8 @@ const APIs_URL = {
   UPDATE_BIRD: (id: number) => `/birds/${id}`
 }
 
-export const addBirdAPI = async (data: AddBirdPayload) => {
-  const formData = new FormData()
-  for (const [key, value] of Object.entries(data)) {
-    formData.append(`${key}`, `${value}`)
-  }
-
-  return await axiosClient.post(APIs_URL.BIRD, formData, {
+export const addBirdAPI = async (data: any) => {
+  return await axiosClient.post(APIs_URL.BIRD, convertToFormData(data), {
     headers: {
       'content-type': 'multipart/form-data'
     }

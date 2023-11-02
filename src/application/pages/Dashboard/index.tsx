@@ -3,7 +3,7 @@ import { Typography, Radio, Card, Statistic, Row, Col, Grid, Space, Table, Tag, 
 import type { RadioChangeEvent } from 'antd'
 import ColumnChart from '~/application/components/dashboard/ColumnChart'
 import type { ColumnsType } from 'antd/es/table'
-import { getStatusInfo } from '~/utils/statusUtils'
+import { getOrderStatus } from '~/utils/statusUtils'
 import { formatCurrencyVND, formatCurrencyVNDToString } from '~/utils/numberUtils'
 import { RevenueData, getRevenueAPI } from '~/utils/api'
 import useFetchData from '~/application/hooks/useFetchData'
@@ -22,23 +22,20 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'Người đặt hàng',
     dataIndex: 'userName',
-    key: 'userName',
     render: (text) => <a>{text}</a>
   },
   {
     title: 'Tổng tiền',
     dataIndex: 'amount',
-    key: 'amount',
     render: (_, { amount }) => {
       return formatCurrencyVND(amount)
     }
   },
   {
     title: 'Trạng thái',
-    key: 'status',
     dataIndex: 'status',
     render: (_, { status }) => {
-      const s = getStatusInfo(status)
+      const s = getOrderStatus(status)
       return (
         <Tag color={s.color} key={status}>
           {s.name}
@@ -48,8 +45,7 @@ const columns: ColumnsType<DataType> = [
   },
   {
     title: 'Mã hóa đơn',
-    dataIndex: 'invoive',
-    key: 'invoive'
+    dataIndex: 'invoive'
   }
 ]
 
@@ -64,7 +60,6 @@ const DashboardPage: React.FC = () => {
   const handleFilterChange = async (e: RadioChangeEvent) => {
     setSize(e.target.value)
     const search = e.target.value
-    console.log(e.target.value)
     setLoading(true)
     try {
       const response = await getRevenueAPI(search)
@@ -121,8 +116,7 @@ const DashboardPage: React.FC = () => {
       }
     }
     getDashboard()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [notification, size])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
@@ -180,8 +174,8 @@ const DashboardPage: React.FC = () => {
                   ) : (
                     <div>
                       {bestsellerResponse &&
-                        bestsellerResponse.data.map((item: { birdName: string; totalSold: number }) => (
-                          <div className='flex flex-col gap-1 py-2'>
+                        bestsellerResponse.data.map((item: { birdName: string; totalSold: number }, index: number) => (
+                          <div className='flex flex-col gap-1 py-2' key={index}>
                             <div className='flex items-center justify-between'>
                               <div className='flex items-center'>{item.birdName}</div>
                               <span>{item.totalSold}</span>

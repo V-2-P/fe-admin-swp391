@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '~/application/hooks/reduxHook'
 import { loginAsync } from '~/redux/slices/accountSlice'
 import { LoginPayload } from '~/utils/api'
-import { LOCAL_STORAGE_KEY, LocalStorageUtils } from '~/utils/cache/LocalStorage'
 const { Title } = Typography
 
 const LoginPage: React.FC = () => {
@@ -20,10 +19,7 @@ const LoginPage: React.FC = () => {
         email: values.email,
         password: values.password
       }
-      const res = await dispatch(loginAsync(payload)).unwrap()
-      const cache = new LocalStorageUtils()
-      const { accessToken } = res
-      cache.setItem(LOCAL_STORAGE_KEY.JWT, accessToken)
+      await dispatch(loginAsync(payload)).unwrap()
       form.resetFields()
       notification.success({ message: `Chào mừng bạn đến với BFS` })
       navigate('/dashboard')
