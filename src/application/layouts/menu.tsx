@@ -42,7 +42,10 @@ const items: MenuItem[] = [
     getItem('Danh sách danh mục', '/categorylist', <ProfileOutlined />),
     getItem('Thêm chim', '/addbird', <PlusOutlined />)
   ]),
-  getItem('Quản lý website', 'sub2', <ShopOutlined />, [getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />)]),
+  getItem('Quản lý website', 'sub2', <ShopOutlined />, [
+    getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />),
+    getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />)
+  ]),
   getItem('Quản lý đơn đặt hàng', 'sub3', <AppstoreOutlined />, [
     getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
     getItem('Giao hàng', '/delivery', <CarOutlined />)
