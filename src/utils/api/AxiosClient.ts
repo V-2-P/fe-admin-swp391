@@ -1,6 +1,8 @@
-import axios, { AxiosInstance, AxiosRequestHeaders } from 'axios'
-
-import { LocalStorageUtils, LOCAL_STORAGE_KEY } from '~/utils/cache/LocalStorage'
+import axios, { AxiosInstance } from 'axios'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '~/application/hooks/reduxHook'
+import { setAccessToken, logout } from '~/redux/slices'
 
 const axiosClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -10,60 +12,101 @@ const axiosClient: AxiosInstance = axios.create({
   withCredentials: true
 })
 
-/* Request Interceptor */
-export const requestInterceptor = async (config: any) => {
-  const storage = new LocalStorageUtils()
-  const customHeader = {} as AxiosRequestHeaders
-  const accessToken = storage.getItem<string>(LOCAL_STORAGE_KEY.JWT)
+const authClient: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    'content-type': 'application/json'
+  },
+  withCredentials: true
+})
 
-  if (accessToken) {
-    customHeader.Authorization = `Bearer ${accessToken}`
-  }
-  return {
-    ...config,
-    headers: {
-      ...customHeader,
-      ...config.headers
+type AxiosInterceptorTypes = {
+  children: React.ReactNode
+}
+const AxiosInterceptor: React.FC<AxiosInterceptorTypes> = ({ children }) => {
+  const [isSet, setIsSet] = useState(false)
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const { accessToken, refreshToken } = useAppSelector((state) => state.account)
+
+  useEffect(() => {
+    /* Request Interceptor */
+    const requestInterceptor = (config: any) => {
+      const customHeader = {} as any
+
+      if (accessToken) {
+        customHeader.Authorization = `Bearer ${accessToken}`
+      }
+
+      return {
+        ...config,
+        headers: {
+          ...customHeader,
+          ...config.headers
+        }
+      }
     }
-  }
+
+    const requestErrorInterceptor = (error: any) => Promise.reject(error)
+
+    /* Response Interceptor */
+    const responseInterceptor = (response: any) => {
+      /**
+       * Add logic for successful response
+       */
+      return response?.data || {}
+    }
+
+    const responseErrorInterceptor = async (error: any) => {
+      /**
+       * Add logic for any error from backend
+       */
+      const originalRequest = error.config
+      if (error.response.data.code === 401 && !originalRequest._retry) {
+        try {
+          originalRequest._retry = true
+          const response = await authClient.post(
+            '/auth/refresh',
+            { refreshToken: refreshToken },
+            { withCredentials: true }
+          )
+          dispatch(setAccessToken(response.data.data.accessToken))
+          originalRequest.headers['Authorization'] = `Bearer ${response.data.data.accessToken}`
+          return axiosClient(originalRequest)
+        } catch (e) {
+          dispatch(logout())
+          navigate('/')
+          if (error.response && error.response.data) {
+            return Promise.reject(error.response.data)
+          } else if (error.message) {
+            return Promise.reject(error.message)
+          } else {
+            return Promise.reject('Có lỗi bất ngờ xảy ra !!!')
+          }
+        }
+      }
+      if (error.response && error.response.data) {
+        return Promise.reject(error.response.data)
+      } else if (error.message) {
+        return Promise.reject(error.message)
+      } else {
+        return Promise.reject('Có lỗi bất ngờ xảy ra !!!')
+      }
+    }
+    setIsSet(true)
+    const interceptorReq = axiosClient.interceptors.request.use(requestInterceptor, requestErrorInterceptor)
+    const interceptorRes = axiosClient.interceptors.response.use(responseInterceptor, responseErrorInterceptor)
+
+    return () => {
+      axiosClient.interceptors.request.eject(interceptorReq)
+      axiosClient.interceptors.response.eject(interceptorRes)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, refreshToken, dispatch])
+
+  return isSet && children
 }
-export const requestErrorInterceptor = (error: any) => Promise.reject(error)
-axiosClient.interceptors.request.use(requestInterceptor, requestErrorInterceptor)
-
-/* Response Interceptor */
-export const responseInterceptor = (response: any) => {
-  /**
-   * Add logic for successful response
-   */
-  return response?.data || {}
-}
-export const responseErrorInterceptor = async (error: any) => {
-  /**
-   * Add logic for any error from backend
-   */
-  const originalRequest = error.config
-  if (error.response.data.code === 401 && !originalRequest._retry) {
-    originalRequest._retry = true
-
-    const response = await axiosClient.post('/auth/refresh')
-
-    const { accessToken } = response.data
-    const storage = new LocalStorageUtils()
-    storage.setItem(LOCAL_STORAGE_KEY.JWT, accessToken)
-    originalRequest.headers.Authorization = `Bearer ${accessToken}`
-
-    return axiosClient(originalRequest)
-  }
-
-  if (error.response && error.response.data.message) {
-    return Promise.reject(error.response.data.message)
-  } else if (error.message) {
-    return Promise.reject(error.message)
-  } else {
-    return Promise.reject('Có lỗi bất ngờ xảy ra !!!')
-  }
-}
-axiosClient.interceptors.response.use(responseInterceptor, responseErrorInterceptor)
 
 /* Export */
 export default axiosClient
+export { AxiosInterceptor }

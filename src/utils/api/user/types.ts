@@ -1,4 +1,34 @@
 import { Dayjs } from 'dayjs'
+
+export type User = {
+  id: number
+  fullName: string
+  phoneNumber: string
+  email: string
+  address: string
+  imageUrl: string
+  roleEntity: {
+    id: number
+    name: string
+  }
+  emailVerified: boolean
+  dob: string
+  isActive: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type UpdateProfilePayload = {
+  fullName?: string
+  email?: string
+  phoneNumber?: string
+  address?: string
+  dob?: string | Dayjs
+  currentPassword?: string
+  password?: string
+  confirmedPassword?: string
+}
+
 export type AddUserPayload = {
   fullName?: string
   email?: string
@@ -24,4 +54,11 @@ export const ROLE = {
   MANAGER: 2,
   STAFF: 3,
   CUSTOMER: 4
+}
+
+export enum Role {
+  ROLE_ADMIN,
+  ROLE_MANAGER,
+  ROLE_STAFF,
+  ROLE_CUSTOMER
 }

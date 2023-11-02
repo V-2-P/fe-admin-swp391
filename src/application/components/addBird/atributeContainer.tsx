@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, InputNumber, Result, Select, Skeleton } from 'antd'
+import { Form, Input, InputNumber, Result, Select, Skeleton } from 'antd'
 
 import { AddBirdPayload } from '~/utils/api/bird/types'
 import { formatCurrencyVNDToString, parseCurrencyVNDToNumber } from '~/utils/numberUtils'
@@ -9,8 +9,16 @@ export interface BirdType {
   name: string
 }
 const AtributeContainer: React.FC = () => {
-  const colors = [{ value: 'gold' }, { value: 'lime' }, { value: 'green' }, { value: 'cyan' }]
-  const puredLevels = [{ value: 'Thuần chủng' }, { value: 'Không thuần chuẩn' }]
+  const puredLevels = [
+    { value: 'Thuần chủng' },
+    { value: 'Hỗn huyết' },
+    { value: 'Lai tạo' },
+    { value: 'F1' },
+    { value: 'F2' },
+    { value: 'F3' },
+    { value: 'Hoang dã' },
+    { value: 'Nhân giống' }
+  ]
   const [fetchBirdTypeLoading, fetchBirdTypeError, fetchBirdTypeResponse] = useFetchData(`/birdtype`)
   const birdTypes: BirdType[] = fetchBirdTypeResponse
     ? fetchBirdTypeResponse.data.map((x: BirdType) => ({
@@ -29,7 +37,7 @@ const AtributeContainer: React.FC = () => {
             name='color'
             rules={[{ required: true, message: 'Vui lòng nhập màu lông!' }]}
           >
-            <Select placeholder='Chọn màu lông' style={{ width: '100%' }} options={colors} size='large' />
+            <Input size='large' placeholder='Vui lòng nhập màu lông' />
           </Form.Item>
 
           <Form.Item<AddBirdPayload>

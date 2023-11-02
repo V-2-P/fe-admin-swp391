@@ -1,58 +1,36 @@
-export const getStatusInfo = (status: string): { name: string; color: string } => {
-  let result
-  switch (status.toUpperCase()) {
-    case 'pending':
-      result = {
-        name: status.toUpperCase(),
-        color: 'cyan'
-      }
-      break
-    case 'processing':
-      result = {
-        name: status.toUpperCase(),
-        color: 'cyan'
-      }
-      break
-    case 'shipping':
-      result = {
-        name: status.toUpperCase(),
-        color: 'gold'
-      }
-      break
-    case 'delivered':
-      result = {
-        name: status.toUpperCase(),
-        color: 'green'
-      }
-      break
-    case 'cancelled':
-      result = {
-        name: status.toUpperCase(),
-        color: 'volcano'
-      }
-      break
-    default:
-      result = {
-        name: 'UNKNOWN',
-        color: 'magenta'
-      }
-  }
-  return result
-}
+import { OrderStatus } from './api'
 
-export const getOrderStatus = (status: string): { name: string; color: string } => {
+export const getOrderStatus = (status: OrderStatus | string): { name: string; color: string } => {
   let result
   switch (status) {
-    case 'pending':
+    case OrderStatus.pending || OrderStatus.pending.toString():
       result = {
-        name: status.toUpperCase(),
+        name: status.toString().toUpperCase(),
+        color: 'orange'
+      }
+      break
+    case OrderStatus.delivered || OrderStatus.delivered.toString():
+      result = {
+        name: status.toString().toUpperCase(),
+        color: 'success'
+      }
+      break
+    case OrderStatus.cancelled || OrderStatus.cancelled.toString():
+      result = {
+        name: status.toString().toUpperCase(),
+        color: 'red'
+      }
+      break
+    case OrderStatus.processing || OrderStatus.processing.toString():
+      result = {
+        name: status.toString().toUpperCase(),
         color: 'processing'
       }
       break
-    case 'delivered':
+    case OrderStatus.shipping || OrderStatus.shipping.toString():
       result = {
-        name: status.toUpperCase(),
-        color: 'success'
+        name: status.toString().toUpperCase(),
+        color: 'purple'
       }
       break
     default:
