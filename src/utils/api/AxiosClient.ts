@@ -76,8 +76,8 @@ const AxiosInterceptor: React.FC<AxiosInterceptorTypes> = ({ children }) => {
         } catch (e) {
           dispatch(logout())
           navigate('/')
-          if (error.response && error.response.data) {
-            return Promise.reject(error.response.data)
+          if (error.response && error.response.data.message) {
+            return Promise.reject(error.response.data.message)
           } else if (error.message) {
             return Promise.reject(error.message)
           } else {
@@ -85,8 +85,8 @@ const AxiosInterceptor: React.FC<AxiosInterceptorTypes> = ({ children }) => {
           }
         }
       }
-      if (error.response && error.response.data) {
-        return Promise.reject(error.response.data)
+      if (error.response && error.response.data.message) {
+        return Promise.reject(error.response.data.message)
       } else if (error.message) {
         return Promise.reject(error.message)
       } else {
