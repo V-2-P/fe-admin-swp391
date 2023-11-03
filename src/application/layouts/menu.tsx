@@ -44,7 +44,8 @@ const items: MenuItem[] = [
   ]),
   getItem('Quản lý website', 'sub2', <ShopOutlined />, [
     getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />),
-    getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />)
+    getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />),
+    getItem('Danh sách vận chuyển', '/shipmentlist', <CommentOutlined />)
   ]),
   getItem('Quản lý đơn đặt hàng', 'sub3', <AppstoreOutlined />, [
     getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
