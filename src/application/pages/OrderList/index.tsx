@@ -1,16 +1,17 @@
 import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input, Result, Tag } from 'antd'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
-import type { FilterConfirmProps } from 'antd/es/table/interface'
+import type { ColumnFilterItem, FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
-import OrderDetail from '~/application/components/orderList/orderDetail'
+import OrderDetailButton from '~/application/components/orderList/orderDetail'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import useFetchData from '~/application/hooks/useFetchData'
-import { getOrderStatus } from '~/utils/statusUtils'
 import { useSearchParams } from 'react-router-dom'
+import { OrderStatus } from '~/utils/api'
+import UpdateOrderStatus from '~/application/components/orderList/updateOrderStatus'
 
 const { Title } = Typography
 
@@ -65,6 +66,28 @@ const OrderList: React.FC = () => {
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
+  const filterStatus: ColumnFilterItem[] = [
+    {
+      value: OrderStatus.cancelled,
+      text: OrderStatus.cancelled.toUpperCase()
+    },
+    {
+      value: OrderStatus.delivered,
+      text: OrderStatus.delivered.toUpperCase()
+    },
+    {
+      value: OrderStatus.pending,
+      text: OrderStatus.pending.toUpperCase()
+    },
+    {
+      value: OrderStatus.processing,
+      text: OrderStatus.processing.toUpperCase()
+    },
+    {
+      value: OrderStatus.shipping,
+      text: OrderStatus.shipping.toUpperCase()
+    }
+  ]
 
   const handleSearch = (
     selectedKeys: string[],
@@ -173,11 +196,14 @@ const OrderList: React.FC = () => {
     {
       title: 'Trạng thái',
       dataIndex: 'status',
+      filters: filterStatus,
+      onFilter: (value: any, record) => record.status.includes(value as string),
       sorter: (a, b) => a.status.localeCompare(b.status),
       render: (_, record) => (
-        <Tag bordered={false} color={getOrderStatus(record.status).color}>
-          {getOrderStatus(record.status).name}
-        </Tag>
+        // <Tag bordered={false} color={getOrderStatus(record.status).color}>
+        //   {getOrderStatus(record.status).name}
+        // </Tag>
+        <UpdateOrderStatus status={record.status} id={record.id} />
       )
     },
     {
@@ -189,7 +215,7 @@ const OrderList: React.FC = () => {
     },
     {
       key: 'action',
-      render: (_, record) => <OrderDetail id={record.id} />,
+      render: (_, record) => <OrderDetailButton id={record.id} />,
       width: '20%'
     }
   ]
@@ -211,6 +237,7 @@ const OrderList: React.FC = () => {
                 <Result title='Failed to fetch' subTitle={error} status='error' />
               ) : (
                 <Table
+                  rowKey={'id'}
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}

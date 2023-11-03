@@ -20,65 +20,23 @@ import type { StepProps, DescriptionsProps } from 'antd'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import type { ColumnsType } from 'antd/es/table'
 import TrackingModal from './trackingModal'
+import { getOrderByIdAPI, Order, OrderDetail, OrderStatus } from '~/utils/api'
 const { Link, Text } = Typography
 const { useBreakpoint } = Grid
-type OrderDetailType = {
-  id: string | number
+type OrderDetailButtonType = {
+  id: number
 }
 interface OrderStep {
   status: 'wait' | 'error' | 'process' | 'finish'
   current: number
 }
-interface Order {
-  id: string
-  name: string
-  quantity: number
-  price: number
-  total: number
-}
-interface Customer {
-  id: string
-  name: string
-  phone: string
-  address: string
-}
-interface DataType {
-  id: string
-  orderList: Order[]
-  discount: number
-  subTotal: number
-  total: number
-  customer: Customer
-  payment: string
-  deliveredBy: string
-  trackingId: string
-}
-const dataTable: DataType = {
-  id: '1',
-  orderList: [
-    { id: 'o1', name: 'Bánh mì', quantity: 2, price: 10000, total: 20000 },
-    { id: 'o2', name: 'Nước ngọt', quantity: 1, price: 5000, total: 5000 }
-  ],
-  discount: 5000,
-  subTotal: 25000,
-  total: 20000,
-  customer: {
-    id: 'c1',
-    name: 'Nguyễn Văn A',
-    phone: '01234567',
-    address: 'Hà Nội'
-  },
-  payment: 'Tiền mặt',
-  deliveredBy: 'Giao hàng nhanh',
-  trackingId: 'fastdelivery1'
-}
 
-const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
+const OrderDetailButton: React.FC<OrderDetailButtonType> = ({ id }) => {
   const screens = useBreakpoint()
-  const { message } = App.useApp()
+  const { notification } = App.useApp()
   const [open, setOpen] = useState(false)
-  const [confirmLoading, setConfirmLoading] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const [data, setData] = useState<Order>()
   const [orderStep, setOrderStep] = useState<OrderStep>({
     status: 'process',
     current: 1
@@ -121,14 +79,14 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
         )
     }
   ]
-  const orderColumns: ColumnsType<Order> = [
+  const orderColumns: ColumnsType<OrderDetail> = [
     {
       title: 'Sản phẩm',
-      dataIndex: 'name'
+      dataIndex: 'birdName'
     },
     {
       title: 'Số lượng',
-      dataIndex: 'quantity',
+      dataIndex: 'numberOfProducts',
       align: 'right'
     },
     {
@@ -143,8 +101,8 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
       title: 'Tổng',
       dataIndex: 'total',
       align: 'right',
-      render: (_, { total }) => {
-        return formatCurrencyVND(total)
+      render: (_, { numberOfProducts, price }) => {
+        return formatCurrencyVND(numberOfProducts * price)
       }
     }
   ]
@@ -152,19 +110,19 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
     {
       key: '1',
       label: 'Tên',
-      children: dataTable.customer.name,
+      children: data?.fullName,
       span: 3
     },
     {
       key: '2',
       label: 'Địa chỉ',
-      children: dataTable.customer.address,
+      children: data?.shippingAddress,
       span: 3
     },
     {
       key: '3',
-      label: 'SĐT',
-      children: dataTable.customer.phone,
+      label: 'Số điện thoại',
+      children: data?.phoneNumber,
       span: 3
     }
   ]
@@ -172,53 +130,68 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
     {
       key: '1',
       label: 'Phương thức thanh toán',
-      children: dataTable.payment,
+      children: data?.paymentMethod,
       span: 3
     },
     {
       key: '2',
       label: 'Giao hàng',
-      children: dataTable.deliveredBy,
+      children: data?.shippingMethod,
       span: 3
     },
     {
       key: '3',
       label: 'Mã giao hàng',
-      children: dataTable.trackingId,
+      children: data?.trackingNumber,
       span: 3
     }
   ]
-  const showModal = (e: React.MouseEvent) => {
+
+  const showModal = async (e: React.MouseEvent) => {
     e.preventDefault()
-    console.log(id)
-    // fetch dữ liệu ở đây
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-    }, 3000)
-
     setOpen(true)
-  }
-
-  const handleOk = () => {
-    setConfirmLoading(true)
-    setTimeout(() => {
-      setOpen(false)
-      setConfirmLoading(false)
-      message.success('Click on Yes')
-    }, 2000)
+    setLoading(true)
+    try {
+      const response = await getOrderByIdAPI(id)
+      setLoading(false)
+      if (response) {
+        const status = response.data.status as OrderStatus
+        setData(response.data)
+        if (status == OrderStatus.pending) {
+          setOrderStep({
+            status: 'process',
+            current: 0
+          })
+        } else if (status == OrderStatus.processing) {
+          setOrderStep({
+            status: 'process',
+            current: 1
+          })
+        } else if (status == OrderStatus.shipping) {
+          setOrderStep({
+            status: 'process',
+            current: 2
+          })
+        } else if (status == OrderStatus.delivered) {
+          setOrderStep({
+            status: 'process',
+            current: 3
+          })
+        }
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
   }
 
   const handleCancel = () => {
     console.log('Clicked cancel button')
     setOpen(false)
   }
-  const onStepChange = (value: number) => {
-    setOrderStep({
-      status: 'process',
-      current: value
-    })
-  }
+
   return (
     <>
       <Link href='' onClick={showModal}>
@@ -230,24 +203,20 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
         style={{ top: 20 }}
         width={1000}
         open={open}
-        onOk={handleOk}
         onCancel={handleCancel}
         maskClosable={false}
         footer={[
           <Button key='back' onClick={handleCancel}>
-            Hủy
+            Đóng
           </Button>,
-          <TrackingModal buttonLoading={loading} id={id} />,
-          <Button key='submit' type='primary' loading={confirmLoading} disabled={loading} onClick={handleOk}>
-            Đồng ý
-          </Button>
+          <TrackingModal buttonLoading={loading} id={id} />
         ]}
       >
         <Skeleton loading={loading} active paragraph={{ rows: 6 }}>
           <Space direction='vertical' className='w-full' size='large'>
             <Steps
               className='custom-step-content'
-              onChange={onStepChange}
+              // onChange={onStepChange}
               current={orderStep.current}
               status={orderStep.status}
               labelPlacement='vertical'
@@ -265,35 +234,44 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
                     }
                   }}
                   columns={orderColumns}
-                  dataSource={dataTable.orderList}
+                  dataSource={data ? data.orderDetails : []}
                   pagination={false}
                   summary={() => {
                     return (
                       <>
                         <Table.Summary.Row>
                           <Table.Summary.Cell index={0} colSpan={2} align='right'>
-                            <b>Sub-Total:</b>
+                            <b>Tồng tiền hàng:</b>
                           </Table.Summary.Cell>
                           <Table.Summary.Cell index={1} colSpan={2} align='right'>
-                            <Text>{formatCurrencyVND(dataTable.subTotal)}</Text>
+                            <Text>{formatCurrencyVND(data?.totalMoney)}</Text>
                           </Table.Summary.Cell>
                         </Table.Summary.Row>
 
                         <Table.Summary.Row>
                           <Table.Summary.Cell index={0} colSpan={2} align='right'>
-                            <b>Discount:</b>
+                            <b>Phí vận chuyển:</b>
                           </Table.Summary.Cell>
                           <Table.Summary.Cell index={1} colSpan={2} align='right'>
-                            <Text>{formatCurrencyVND(dataTable.discount)}</Text>
+                            <Text>{formatCurrencyVND(data?.shippingMoney)}</Text>
                           </Table.Summary.Cell>
                         </Table.Summary.Row>
 
                         <Table.Summary.Row>
                           <Table.Summary.Cell index={0} colSpan={2} align='right'>
-                            <b>Total:</b>
+                            <b>Giảm giá:</b>
                           </Table.Summary.Cell>
                           <Table.Summary.Cell index={1} colSpan={2} align='right'>
-                            <Text>{formatCurrencyVND(dataTable.total)}</Text>
+                            <Text>{formatCurrencyVND(data?.discount)}</Text>
+                          </Table.Summary.Cell>
+                        </Table.Summary.Row>
+
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={0} colSpan={2} align='right'>
+                            <b>Thành tiền:</b>
+                          </Table.Summary.Cell>
+                          <Table.Summary.Cell index={1} colSpan={2} align='right'>
+                            <Text>{formatCurrencyVND(data?.totalPayment)}</Text>
                           </Table.Summary.Cell>
                         </Table.Summary.Row>
                       </>
@@ -319,4 +297,4 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
   )
 }
 
-export default OrderDetail
+export default OrderDetailButton

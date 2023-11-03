@@ -1,94 +1,55 @@
-import React, { useState } from 'react'
-import { Space, Typography, Row, Col, Card, App, Form, Button, Select, Input, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Space, Typography, Row, Col, Card, App, Form, Button, Input, Table } from 'antd'
 import axiosClient from '~/utils/api/AxiosClient'
 import DebounceSelect, { OptionType } from '~/application/components/shared/DebounceSelect'
 import { DeliveryFieldType } from '~/application/components/delivery/type'
 import type { ColumnsType } from 'antd/es/table'
-import { formatCurrencyVNDToString } from '~/utils/numberUtils'
-import OrderDetail from '~/application/components/delivery/orderDetail'
+import { formatCurrencyVND } from '~/utils/numberUtils'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Order, OrderDetail, getOrderByIdAPI, updateOrderShippingStatusAPI } from '~/utils/api'
+import { reFetchData } from '~/redux/slices'
+import { useAppDispatch } from '~/application/hooks/reduxHook'
 
 const { Title, Text } = Typography
 
-interface DataType {
-  key: string
-  orderId: string
-  customer: string
-  quantity: number
-}
-
-const columns: ColumnsType<DataType> = [
+const columns: ColumnsType<OrderDetail> = [
   {
-    title: 'Đơn hàng',
-    dataIndex: 'orderId'
-  },
-  {
-    title: 'Khách hàng',
-    dataIndex: 'customer'
+    title: 'Sản phẩm',
+    dataIndex: 'birdName'
   },
   {
     title: 'Số lượng',
-    dataIndex: 'quantity'
+    dataIndex: 'numberOfProducts',
+    align: 'right'
   },
   {
-    title: 'Hành động',
-    key: 'action',
-    render: (_, record) => <OrderDetail id={record.orderId} />,
-    width: '20%'
-  }
-]
-
-const data: DataType[] = [
-  {
-    key: '1',
-    customer: 'John Brown',
-    quantity: 10,
-    orderId: '#INV10001'
+    title: 'Giá tiền',
+    dataIndex: 'price',
+    align: 'right',
+    render: (_, { price }) => {
+      return formatCurrencyVND(price)
+    }
   },
   {
-    key: '2',
-    customer: 'Jim Green',
-    quantity: 100,
-    orderId: '#INV10002'
-  },
-  {
-    key: '3',
-    customer: 'Joe Black',
-    quantity: 10,
-    orderId: '#INV10003'
-  },
-  {
-    key: '4',
-    customer: 'Jim Red',
-    quantity: 75,
-    orderId: '#INV10004'
+    title: 'Tổng',
+    dataIndex: 'total',
+    align: 'right',
+    render: (_, { numberOfProducts, price }) => {
+      return formatCurrencyVND(numberOfProducts * price)
+    }
   }
 ]
 
 const Delivery: React.FC = () => {
-  const { message } = App.useApp()
-  const [value, setValue] = useState<OptionType[]>([])
-  const [dataSource, setDataSource] = useState<DataType[]>([])
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { message, notification } = App.useApp()
+  const dispatch = useAppDispatch()
+  const [data, setData] = useState<Order>()
   const [dataSourceLoading, setDataSourceLoading] = useState(false)
-  const carriers = [
-    { value: 'Viettel Post' },
-    { value: 'Giaohangnhanh' },
-    { value: 'Giao hàng tiết kiệm' },
-    { value: 'Việt Nam Post HN' },
-    { value: 'Tự Vận Chuyển' },
-    { value: 'Ahamove' },
-    { value: 'Việt Nam Post HCM' },
-    { value: 'Việt Nam Post' },
-    { value: 'JT Express' },
-    { value: 'EMS' },
-    { value: 'Best Express' },
-    { value: 'Ninja Van' },
-    { value: 'SuperShip' },
-    { value: 'SPX Express' },
-    { value: 'Lazada Express' },
-    { value: 'Grab Express' },
-    { value: 'Tiki Express' },
-    { value: 'Giao hàng tiêu chuẩn' }
-  ]
+  const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false)
+  const [form] = Form.useForm<DeliveryFieldType>()
+
   const fetchUserList = async (username: string): Promise<OptionType[]> => {
     console.log('fetching user', username)
     const res = (await axiosClient.get('https://randomuser.me/api/?results=5')) as any
@@ -99,19 +60,30 @@ const Delivery: React.FC = () => {
     }))
   }
   const handleChangeData = (newValue: OptionType[]) => {
-    setValue(newValue)
-    setDataSourceLoading(true)
-    setTimeout(() => {
-      setDataSourceLoading(false)
-      if (newValue.length === 0) {
-        setDataSource([])
-      } else {
-        setDataSource(data)
-      }
-    }, 2000)
+    if (!newValue) {
+      navigate('/delivery')
+    } else {
+      navigate('/delivery/' + Math.random())
+    }
   }
-  const onFinish = (values: any) => {
-    console.log('Success:', values)
+  const onFinish = async (values: DeliveryFieldType) => {
+    setIsButtonLoading(true)
+    try {
+      const payload = {
+        trackingNumber: values.trackingId
+      }
+      const response = await updateOrderShippingStatusAPI(Number(id), payload)
+      setIsButtonLoading(false)
+      if (response) {
+        notification.success({ message: `Cập nhật thành công` })
+        dispatch(reFetchData())
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setIsButtonLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
   }
 
   const onFinishFailed = (errorInfo: any) => {
@@ -121,7 +93,31 @@ const Delivery: React.FC = () => {
       return
     }
   }
+  useEffect(() => {
+    const fetchUser = async (id: number) => {
+      form.setFieldsValue({
+        inputOrderId: {
+          value: id.toString(),
+          label: id
+        }
+      })
+      setDataSourceLoading(true)
+      const res = await getOrderByIdAPI(id)
+      const data: Order = res.data
 
+      setData(data)
+      form.setFieldsValue({
+        deliveryBy: data.shippingMethod,
+        trackingId: data.trackingNumber
+      })
+      setDataSourceLoading(false)
+    }
+    if (id) {
+      fetchUser(Number(id))
+    } else {
+      form.resetFields()
+    }
+  }, [form, id])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
@@ -132,6 +128,7 @@ const Delivery: React.FC = () => {
           <Col span={24}>
             <Card bordered={false}>
               <Form
+                form={form}
                 name='delivery'
                 labelCol={{ span: 8 }}
                 labelAlign='left'
@@ -143,13 +140,12 @@ const Delivery: React.FC = () => {
               >
                 <Form.Item<DeliveryFieldType>
                   label='Mã đơn hàng'
-                  name='orderId'
+                  name='inputOrderId'
                   rules={[{ required: true, message: 'Vui lòng chọn mã đơn hàng!' }]}
                 >
                   <DebounceSelect
-                    mode='tags'
-                    value={value}
-                    placeholder='Chọn 1 hay nhiều đơn hàng'
+                    showSearch
+                    placeholder='Chọn mã đơn hàng'
                     fetchOptions={fetchUserList}
                     onChange={(newValue) => handleChangeData(newValue as OptionType[])}
                     size='large'
@@ -161,33 +157,45 @@ const Delivery: React.FC = () => {
                   <Table
                     columns={columns}
                     loading={dataSourceLoading}
-                    dataSource={dataSource}
+                    dataSource={data ? data.orderDetails : []}
                     pagination={false}
                     bordered
-                    summary={(pageData) => {
-                      let totalQuantity = 0
-                      let totalOrder = 0
-                      pageData.forEach(({ quantity }) => {
-                        totalQuantity += quantity
-                        totalOrder += 1
-                      })
-
+                    summary={() => {
                       return (
                         <>
                           <Table.Summary.Row>
-                            <Table.Summary.Cell index={0} colSpan={1} align='right'>
-                              <Text strong>Tổng số sản phẩm</Text>
+                            <Table.Summary.Cell index={0} colSpan={2} align='right'>
+                              <b>Tồng tiền hàng:</b>
                             </Table.Summary.Cell>
-                            <Table.Summary.Cell index={1} colSpan={3} align='center'>
-                              <Text strong>{formatCurrencyVNDToString(totalQuantity)}</Text>
+                            <Table.Summary.Cell index={1} colSpan={2} align='right'>
+                              <Text>{formatCurrencyVND(data?.totalMoney)}</Text>
                             </Table.Summary.Cell>
                           </Table.Summary.Row>
+
                           <Table.Summary.Row>
-                            <Table.Summary.Cell index={0} colSpan={1} align='right'>
-                              <Text strong>Tổng đơn hàng</Text>
+                            <Table.Summary.Cell index={0} colSpan={2} align='right'>
+                              <b>Phí vận chuyển:</b>
                             </Table.Summary.Cell>
-                            <Table.Summary.Cell index={1} colSpan={3} align='center'>
-                              <Text strong>{formatCurrencyVNDToString(totalOrder)}</Text>
+                            <Table.Summary.Cell index={1} colSpan={2} align='right'>
+                              <Text>{formatCurrencyVND(data?.shippingMoney)}</Text>
+                            </Table.Summary.Cell>
+                          </Table.Summary.Row>
+
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0} colSpan={2} align='right'>
+                              <b>Giảm giá:</b>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={1} colSpan={2} align='right'>
+                              <Text>{formatCurrencyVND(data?.discount)}</Text>
+                            </Table.Summary.Cell>
+                          </Table.Summary.Row>
+
+                          <Table.Summary.Row>
+                            <Table.Summary.Cell index={0} colSpan={2} align='right'>
+                              <b>Thành tiền:</b>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={1} colSpan={2} align='right'>
+                              <Text>{formatCurrencyVND(data?.totalPayment)}</Text>
                             </Table.Summary.Cell>
                           </Table.Summary.Row>
                         </>
@@ -196,12 +204,8 @@ const Delivery: React.FC = () => {
                   />
                 </Form.Item>
 
-                <Form.Item<DeliveryFieldType>
-                  name='deliveryBy'
-                  label='Hãng vận chuyển'
-                  rules={[{ required: true, message: 'Vui lòng chọn hãng vận chuyển!' }]}
-                >
-                  <Select placeholder='Chọn hãng vẫn chuyển' options={carriers} size='large' />
+                <Form.Item<DeliveryFieldType> name='deliveryBy' label='Phương thức vận chuyển'>
+                  <Input size='large' disabled placeholder='Vui lòng chọn phương thức vận chuyển' />
                 </Form.Item>
                 <Form.Item<DeliveryFieldType>
                   label='Mã vận chuyển'
@@ -211,8 +215,8 @@ const Delivery: React.FC = () => {
                   <Input size='large' placeholder='Vui lòng nhập mã vận chuyển' />
                 </Form.Item>
                 <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
-                  <Button type='primary' htmlType='submit' className='w-full' size='large'>
-                    Submit
+                  <Button loading={isButtonLoading} type='primary' htmlType='submit' className='w-full' size='large'>
+                    Xác nhận
                   </Button>
                 </Form.Item>
               </Form>

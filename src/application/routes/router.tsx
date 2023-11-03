@@ -52,6 +52,7 @@ const Router: React.FC = () => {
                 <Route path='/orderlist' element={<OrderList />} />
                 <Route path='/stafflist' element={<StaffList />} />
                 <Route path='/delivery' element={<Delivery />} />
+                <Route path='/delivery/:id' element={<Delivery />} />
                 <Route path='/feedbacklist' element={<FeedbackList />} />
                 <Route path='/updatestaff' element={<UpdateStaff />} />
                 <Route path='/updatestaff/:id' element={<UpdateStaff />} />
