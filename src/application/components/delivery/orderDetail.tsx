@@ -53,7 +53,7 @@ const dataTable: DataType = {
   trackingId: 'fastdelivery1'
 }
 
-const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
+const OrderDetailButton: React.FC<OrderDetailType> = ({ id }) => {
   const { message } = App.useApp()
   const [open, setOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
@@ -219,4 +219,4 @@ const OrderDetail: React.FC<OrderDetailType> = ({ id }) => {
   )
 }
 
-export default OrderDetail
+export default OrderDetailButton
