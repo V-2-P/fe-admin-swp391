@@ -12,7 +12,8 @@ type DeleteButtonTypes = {
 const DeleteButton: React.FC<DeleteButtonTypes> = ({ onDelete }) => {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const { notification } = App.useApp()
-  const handleDelete = async () => {
+  const handleDelete = async (e: any) => {
+    e.stopPropagation()
     setDeleteLoading(true)
 
     try {

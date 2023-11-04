@@ -3,7 +3,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import React, { useState } from 'react'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 import { reFetchData } from '~/redux/slices'
-import { UpdateVoucherPayload, deleteVoucherAPI, updateVoucherAPI } from '~/utils/api/voucher'
+import { UpdateVoucherPayload, deleteVoucherAPI, updateVoucherAPI } from '~/utils/api'
 import { formatCurrencyVNDToString, parseCurrencyVNDToNumber } from '~/utils/numberUtils'
 
 interface Voucher {
@@ -44,7 +44,7 @@ const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({ voucher }) => {
       setOpen(false)
       setConfirmLoading(false)
       if (response) {
-        notification.success({ message: 'Sửa voucher thành công' })
+        notification.success({ message: 'Xóa voucher thành công' })
         dispatch(reFetchData())
       } else {
         notification.error({ message: 'Sorry! Something went wrong. App server error' })
@@ -262,7 +262,7 @@ const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({ voucher }) => {
             </Button>
           </Popconfirm>
           <Button loading={loading} type='primary' htmlType='submit'>
-            Sửa đôi
+            Sửa đổi
           </Button>
         </div>
       </Form.Item>
