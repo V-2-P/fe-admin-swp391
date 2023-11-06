@@ -1,12 +1,13 @@
 import { Card, Col, Row, Space, Table, Typography } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import React, { useEffect, useState } from 'react'
+import AddVoucherForm from '~/application/components/voucherList/addVoucherForm'
 import UpdateVoucherForm from '~/application/components/voucherList/updateVoucherForm'
 import useFetchData from '~/application/hooks/useFetchData'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import { formatCurrencyVND, formatCurrencyVNDToString } from '~/utils/numberUtils'
 
-const { Title } = Typography
+const { Title, Paragraph } = Typography
 
 interface Voucher {
   createdAt: Date
@@ -20,6 +21,7 @@ interface Voucher {
   description: string
   startDate: Date
   expirationDate: Date
+  status: boolean
 }
 
 const columns: ColumnsType<Voucher> = [
@@ -65,7 +67,12 @@ const columns: ColumnsType<Voucher> = [
   },
   {
     title: 'Trạng thái',
-    align: 'center'
+    dataIndex: 'status',
+    render: (_, record) => {
+      console.log(record)
+      return <Paragraph ellipsis={{ rows: 3 }}>{record.status ? 'Kích hoạt' : 'Chưa kích hoạt'}</Paragraph>
+    },
+    align: 'left'
   }
 ]
 
@@ -83,6 +90,7 @@ const VoucherList: React.FC = () => {
       <Space size='large' direction='vertical' className='w-full'>
         <div className='flex flex-row justify-between items-center'>
           <Title level={3}>Danh sách voucher</Title>
+          <AddVoucherForm />
         </div>
         <Row>
           <Col span={24}>

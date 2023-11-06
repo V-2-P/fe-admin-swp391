@@ -1,4 +1,4 @@
-export type UpdateVoucherPayload = {
+export type VoucherPayload = {
   discount?: number
   name?: string
   description?: string
@@ -7,4 +7,5 @@ export type UpdateVoucherPayload = {
   expirationDate?: string
   startDate?: string
   minValue?: number
+  status?: string
 }

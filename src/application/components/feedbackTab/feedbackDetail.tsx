@@ -1,34 +1,51 @@
 import React, { useState } from 'react'
-import { Card, Modal, Skeleton, Typography, Button, Row, Col, Descriptions } from 'antd'
+import { Card, Modal, Skeleton, Typography, Button, Row, Col, Descriptions, notification } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import { StarFilled } from '@ant-design/icons'
-import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
+import { getFeedbackById } from '~/utils/api/feedback/function'
 const { Link } = Typography
 
 type FeedbackDetailType = {
   id: string | number
 }
 
+interface BirdReview {
+  id: number
+  birdId: number
+  userImage: string
+  birdName: string
+  rating: number
+  comment: string
+  birdType: string
+  orderId: number
+  fullName: string
+  address: string
+  phoneNumber: string
+  status: boolean
+  createdAt: string
+}
+
 const FeedbackDetail: React.FC<FeedbackDetailType> = ({ id }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const [data, setData] = useState<BirdReview>()
   const userDescription: DescriptionsProps['items'] = [
     {
       key: '1',
       label: 'Tên',
-      children: 'Anh Vũ',
+      children: data?.fullName,
       span: 3
     },
     {
       key: '2',
       label: 'Địa chỉ',
-      children: 'Fake address',
+      children: data?.address,
       span: 3
     },
     {
       key: '3',
       label: 'SĐT',
-      children: '0707943005',
+      children: data?.phoneNumber,
       span: 3
     }
   ]
@@ -36,19 +53,19 @@ const FeedbackDetail: React.FC<FeedbackDetailType> = ({ id }) => {
     {
       key: '1',
       label: 'Mã đơn hàng',
-      children: '#INV10001',
+      children: data?.orderId,
       span: 3
     },
     {
       key: '2',
       label: 'Mã chim',
-      children: 'BIRD009',
+      children: data?.birdId,
       span: 3
     },
     {
       key: '3',
       label: 'Chim',
-      children: 'Chim cu',
+      children: data?.birdName,
       span: 3
     },
     {
@@ -57,7 +74,7 @@ const FeedbackDetail: React.FC<FeedbackDetailType> = ({ id }) => {
       children: (
         <div className='flex flex-row gap-1 items-center justify-center'>
           <StarFilled className='!text-orange-500' />
-          <span>{Number(5).toPrecision(2)}</span>
+          <span>{data?.rating}</span>
         </div>
       ),
       span: 3
@@ -65,32 +82,38 @@ const FeedbackDetail: React.FC<FeedbackDetailType> = ({ id }) => {
     {
       key: '5',
       label: 'Đánh giá',
-      children: 'Good service but delayed delivery',
+      children: data?.comment,
       span: 3
     },
     {
       key: '6',
       label: 'Trạng thái',
-      children: 'Hiện',
+      children: data && data?.status ? 'Hiện' : 'Ẩn',
       span: 3
     },
     {
       key: '7',
       label: 'Ngày đánh giá',
-      children: formatDateToDDMMYYYY(new Date()),
+      children: data?.createdAt,
       span: 3
     }
   ]
-  const showModal = (e: React.MouseEvent) => {
+  const showModal = async (e: React.MouseEvent) => {
     e.preventDefault()
-    console.log(id)
-    // fetch dữ liệu ở đây
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-    }, 3000)
-
     setOpen(true)
+    setLoading(true)
+    try {
+      const response = await getFeedbackById(id)
+      setLoading(false)
+      if (response) {
+        setData(response.data)
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
   }
 
   const handleOk = () => {
