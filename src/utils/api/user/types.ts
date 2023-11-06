@@ -16,6 +16,9 @@ export type User = {
   isActive: number
   createdAt: Date
   updatedAt: Date
+  orderQuantity: number
+  bookingQuantity: number
+  totalMoney: number
 }
 
 export type UpdateProfilePayload = {

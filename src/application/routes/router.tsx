@@ -24,6 +24,7 @@ import ErrorBoundary from './errorBoundary'
 import CommonLayout from '../layouts/common'
 import PrivateRoute from '../components/route/PrivateRoute'
 import PublicRoute from '../components/route/PublicRoute'
+import BookingList from '../pages/BookingList'
 
 const Wrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
   const location = useLocation()
@@ -62,6 +63,7 @@ const Router: React.FC = () => {
                 <Route path='/addstaff' element={<AddStaff />} />
                 <Route path='/voucherlist' element={<VoucherList />} />
                 <Route path='/shipmentlist' element={<ShipmentList />} />
+                <Route path='/bookinglist' element={<BookingList />} />
               </Route>
             </Route>
 
