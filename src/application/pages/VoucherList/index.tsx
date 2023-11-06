@@ -21,7 +21,7 @@ interface Voucher {
   description: string
   startDate: Date
   expirationDate: Date
-  status: boolean
+  status: 'isActive' | 'expired' | 'notActivated' | 'cancelled'
 }
 
 const columns: ColumnsType<Voucher> = [
@@ -69,8 +69,15 @@ const columns: ColumnsType<Voucher> = [
     title: 'Trạng thái',
     dataIndex: 'status',
     render: (_, record) => {
-      console.log(record)
-      return <Paragraph ellipsis={{ rows: 3 }}>{record.status ? 'Kích hoạt' : 'Chưa kích hoạt'}</Paragraph>
+      if (record.status === 'isActive') {
+        return <Paragraph>Kích hoạt</Paragraph>
+      } else if (record.status === 'expired') {
+        return <Paragraph>Hết hạn</Paragraph>
+      } else if (record.status === 'notActivated') {
+        return <Paragraph>Chưa kích hoạt</Paragraph>
+      } else {
+        return <Paragraph>Đã hủy bỏ</Paragraph>
+      }
     },
     align: 'left'
   }
@@ -78,6 +85,7 @@ const columns: ColumnsType<Voucher> = [
 
 const VoucherList: React.FC = () => {
   const [loading, error, response] = useFetchData(`/voucher`)
+  console.log(response)
   const [data, setData] = useState<Voucher[]>([])
 
   useEffect(() => {

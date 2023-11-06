@@ -111,7 +111,7 @@ const FeedbackOrderTab: React.FC = () => {
     {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
-      sorter: (a, b) => a.birdName.localeCompare(b.birdName)
+      sorter: (a, b) => a.createdAt.localeCompare(b.createdAt)
     },
     {
       title: 'Chim',

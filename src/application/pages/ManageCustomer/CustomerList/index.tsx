@@ -1,119 +1,43 @@
 import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input } from 'antd'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { FilterConfirmProps } from 'antd/es/table/interface'
 import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
-import { formatCurrencyVND } from '~/utils/numberUtils'
+import useFetchData from '~/application/hooks/useFetchData'
+import CustomerDetail from '~/application/components/customerList/customerDetail'
 
 const { Title } = Typography
 
 interface DataType {
+  createdAt: string
+  updatedAt: string
   id: number
-  name: string
+  fullName: string
+  phoneNumber: string
   email: string
-  status: string
-  spend: number
-  numberOfOrders: number
+  address: string
+  imageUrl: string
+  roleEntity: {
+    id: number
+    name: string
+  }
+  emailVerified: boolean
+  dob: string
+  isActive: number
+  orderQuantity: number
+  bookingQuantity: number
+  totalMoney: number
 }
 
 type DataIndex = keyof DataType
 
-const dataTable: DataType[] = [
-  {
-    id: 1,
-    name: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    status: 'Active',
-    spend: 500000,
-    numberOfOrders: 10
-  },
-  {
-    id: 2,
-    name: 'Trần Thị B',
-    email: 'tranthib@example.com',
-    status: 'Inactive',
-    spend: 250000,
-    numberOfOrders: 5
-  },
-  {
-    id: 3,
-    name: 'Lê Văn C',
-    email: 'levanc@example.com',
-    status: 'Active',
-    spend: 800000,
-    numberOfOrders: 15
-  },
-  {
-    id: 4,
-    name: 'Phạm Thị D',
-    email: 'phamthid@example.com',
-    status: 'Active',
-    spend: 300000,
-    numberOfOrders: 8
-  },
-  {
-    id: 5,
-    name: 'Hoàng Văn E',
-    email: 'hoangvane@example.com',
-    status: 'Inactive',
-    spend: 150000,
-    numberOfOrders: 3
-  },
-  {
-    id: 6,
-    name: 'Nguyễn Thị F',
-    email: 'nguyenthif@example.com',
-    status: 'Active',
-    spend: 700000,
-    numberOfOrders: 12
-  },
-  {
-    id: 7,
-    name: 'Trần Văn G',
-    email: 'tranvang@example.com',
-    status: 'Inactive',
-    spend: 200000,
-    numberOfOrders: 4
-  },
-  {
-    id: 8,
-    name: 'Lê Thị H',
-    email: 'lethih@example.com',
-    status: 'Active',
-    spend: 600000,
-    numberOfOrders: 11
-  },
-  {
-    id: 9,
-    name: 'Phạm Văn I',
-    email: 'phamvani@example.com',
-    status: 'Active',
-    spend: 400000,
-    numberOfOrders: 7
-  },
-  {
-    id: 10,
-    name: 'Hoàng Thị K',
-    email: 'hoangthik@example.com',
-    status: 'Inactive',
-    spend: 100000,
-    numberOfOrders: 2
-  },
-  {
-    id: 11,
-    name: 'Hoàng Thị t',
-    email: 'hoangthik@example.com',
-    status: 'Inactive',
-    spend: 100000,
-    numberOfOrders: 2
-  }
-]
-
 const CustomerList: React.FC = () => {
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
+  const [loadingUser, errorUser, responseUser] = useFetchData('/users')
+  console.log(responseUser)
   const searchInput = useRef<InputRef>(null)
   const handleSearch = (
     selectedKeys: string[],
@@ -202,9 +126,9 @@ const CustomerList: React.FC = () => {
   const columns: ColumnsType<DataType> = [
     {
       title: 'Customer',
-      dataIndex: 'name',
-      ...getColumnSearchProps('name'),
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      dataIndex: 'fullName',
+      ...getColumnSearchProps('fullName'),
+      sorter: (a, b) => a.fullName.localeCompare(b.fullName),
       width: '20%'
     },
     {
@@ -214,39 +138,24 @@ const CustomerList: React.FC = () => {
       width: '30%'
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      sorter: (a, b) => a.status.localeCompare(b.status),
-      width: '12%'
-    },
-    {
-      title: 'Order',
-      dataIndex: 'numberOfOrders',
-      sorter: (a, b) => a.numberOfOrders - b.numberOfOrders,
-      width: '8%'
-    },
-    {
-      title: 'Spend',
-      dataIndex: 'spend',
-      sorter: (a, b) => a.spend - b.spend,
-      render: (_, { spend }) => {
-        return formatCurrencyVND(spend)
-      },
+      title: 'Phone',
+      dataIndex: 'phoneNumber',
+      sorter: (a, b) => a.email.localeCompare(b.email),
       width: '15%'
     },
     {
       title: 'Action',
       key: 'action',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: (_, _record) => (
+      fixed: 'right',
+      render: (_, record) => (
         <Space size='middle' direction='horizontal' className='!w-full'>
-          <Button type='link'>Xem</Button>
+          <CustomerDetail id={record.id} />
           <Button type='link' danger>
             Khóa
           </Button>
         </Space>
       ),
-      width: '25%'
+      width: '15%'
     }
   ]
   const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
@@ -260,16 +169,29 @@ const CustomerList: React.FC = () => {
         </div>
         <Row>
           <Col span={24}>
-            <Card bordered={false}>
-              <Table
-                style={{ minHeight: 300 }}
-                columns={columns}
-                pagination={{ pageSize: 10 }}
-                scroll={{ x: 800, y: 300 }}
-                dataSource={dataTable}
-                onChange={onChange}
-              />
-            </Card>
+            {!errorUser ? (
+              <Card bordered={false}>
+                <Table
+                  loading={loadingUser}
+                  style={{ minHeight: 300 }}
+                  columns={columns}
+                  pagination={{ pageSize: 10 }}
+                  scroll={{ x: 800, y: 300 }}
+                  dataSource={responseUser ? responseUser?.data?.users.filter((e: any) => e.roleEntity.id === 4) : []}
+                  onChange={onChange}
+                  onRow={(record, rowIndex) => {
+                    return {
+                      onClick: () => {
+                        console.log(rowIndex)
+                        console.log(record)
+                      }
+                    }
+                  }}
+                />
+              </Card>
+            ) : (
+              <Result title='Failed to fetch' subTitle={errorUser} status='error' />
+            )}
           </Col>
         </Row>
       </Space>
