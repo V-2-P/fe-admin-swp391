@@ -202,7 +202,13 @@ const StaffList: React.FC = () => {
       <Space size='large' direction='vertical' className='w-full'>
         <div className='flex flex-row justify-between items-center'>
           <Title level={3}>Danh sách nhân viên</Title>
-          <Button type='primary' icon={<PlusOutlined />} shape='round' size='large'>
+          <Button
+            onClick={() => navigate('/addstaff')}
+            type='primary'
+            icon={<PlusOutlined />}
+            shape='round'
+            size='large'
+          >
             Thêm Nhân viên
           </Button>
         </div>

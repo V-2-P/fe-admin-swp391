@@ -3,7 +3,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import React, { useState } from 'react'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 import { reFetchData } from '~/redux/slices'
-import { UpdateVoucherPayload, deleteVoucherAPI, updateVoucherAPI } from '~/utils/api'
+import { VoucherPayload, deleteVoucherAPI, updateVoucherAPI } from '~/utils/api'
 import { formatCurrencyVNDToString, parseCurrencyVNDToNumber } from '~/utils/numberUtils'
 
 interface Voucher {
@@ -65,7 +65,7 @@ const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({ voucher }) => {
     setLoading(true)
     const expirationDate = values.expirationDate as Dayjs
     const startDate = values.startDate as Dayjs
-    const payload: UpdateVoucherPayload = {
+    const payload: VoucherPayload = {
       discount: values.discount,
       name: values.name,
       ...(values.description && { description: values.description }),
