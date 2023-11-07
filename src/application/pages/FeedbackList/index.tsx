@@ -1,6 +1,7 @@
 import React from 'react'
 import { Space, Typography, Row, Col, Tabs } from 'antd'
-import FeedbackOrderTab from '~/application/components/feedbackTab/feedbackOrderTab'
+import FeedbackOrderTab from '~/application/components/feedbackTab/Order/feedbackOrderTab'
+import FeedbackBookingTab from '~/application/components/feedbackTab/Booking/feedbackBookingTab'
 const { Title } = Typography
 
 const FeedbackList: React.FC = () => {
@@ -17,7 +18,7 @@ const FeedbackList: React.FC = () => {
                 <FeedbackOrderTab />
               </Tabs.TabPane>
               <Tabs.TabPane tab='Booking' key='2'>
-                Booking
+                <FeedbackBookingTab />
               </Tabs.TabPane>
             </Tabs>
           </Col>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
@@ -7,6 +7,7 @@ import Highlighter from 'react-highlight-words'
 import type { InputRef } from 'antd'
 import useFetchData from '~/application/hooks/useFetchData'
 import CustomerDetail from '~/application/components/customerList/customerDetail'
+import { useSearchParams } from 'react-router-dom'
 
 const { Title } = Typography
 
@@ -26,9 +27,10 @@ interface DataType {
   emailVerified: boolean
   dob: string
   isActive: number
-  orderQuantity: number
-  bookingQuantity: number
-  totalMoney: number
+}
+
+interface Users {
+  user: DataType
 }
 
 type DataIndex = keyof DataType
@@ -36,8 +38,12 @@ type DataIndex = keyof DataType
 const CustomerList: React.FC = () => {
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
-  const [loadingUser, errorUser, responseUser] = useFetchData('/users')
-  console.log(responseUser)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
+  const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
+  const [loadingUser, errorUser, responseUser] = useFetchData(`/users?roleId=4&page=${page - 1}&limit=${limit}`)
+  const [data, setData] = useState<Users[]>([])
+  const totalPages = responseUser ? responseUser.data.totalPages : 0
   const searchInput = useRef<InputRef>(null)
   const handleSearch = (
     selectedKeys: string[],
@@ -160,7 +166,15 @@ const CustomerList: React.FC = () => {
   ]
   const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
+    const currentPage = pagination.current!
+    setSearchParams(`page=${currentPage}&limit=${limit}`)
   }
+  useEffect(() => {
+    if (!loadingUser && !errorUser && responseUser) {
+      setData(responseUser?.data.users)
+    }
+  }, [loadingUser, errorUser, responseUser, data])
+  console.log(data)
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
@@ -175,9 +189,9 @@ const CustomerList: React.FC = () => {
                   loading={loadingUser}
                   style={{ minHeight: 300 }}
                   columns={columns}
-                  pagination={{ pageSize: 10 }}
+                  pagination={{ pageSize: limit, total: totalPages * limit, current: page }}
                   scroll={{ x: 800, y: 300 }}
-                  dataSource={responseUser ? responseUser?.data?.users.filter((e: any) => e.roleEntity.id === 4) : []}
+                  dataSource={data.map((e: any) => e.user)}
                   onChange={onChange}
                   onRow={(record, rowIndex) => {
                     return {

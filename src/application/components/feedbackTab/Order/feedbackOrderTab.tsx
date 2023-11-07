@@ -1,13 +1,16 @@
-import { Button, Card, Input, InputRef, Result, Space, Table, Typography } from 'antd'
+import { Button, Card, Input, InputRef, Result, Space, Table, Typography, notification } from 'antd'
 import { ColumnType, ColumnsType } from 'antd/es/table'
 import { TableProps } from 'antd/lib'
 import React, { useRef, useState } from 'react'
 import useFetchData from '~/application/hooks/useFetchData'
-import FeedbackDetail from './feedbackDetail'
+import FeedbackDetail from './feedbackOrderDetail'
 import Highlighter from 'react-highlight-words'
 import { FilterConfirmProps } from 'antd/es/table/interface'
 import { SearchOutlined, StarFilled } from '@ant-design/icons'
-const { Link, Paragraph } = Typography
+import { useAppDispatch } from '~/application/hooks/reduxHook'
+import { reFetchData } from '~/redux/slices'
+import { hiddenFeedbackByIdAPI } from '~/utils/api/feedback/function'
+const { Paragraph } = Typography
 
 interface DataType {
   id: number
@@ -31,6 +34,8 @@ const FeedbackOrderTab: React.FC = () => {
   const [searchedColumn, setSearchedColumn] = useState('')
   const [feedbackLoading, feedbackError, feedbackResponse] = useFetchData('/feedbackbirds')
   const searchInput = useRef<InputRef>(null)
+  const dispatch = useAppDispatch()
+  const [loading, setLoading] = useState(false)
   const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<DataType> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
@@ -164,7 +169,11 @@ const FeedbackOrderTab: React.FC = () => {
       title: 'Đánh giá',
       dataIndex: 'comment',
       render: (_, { comment }) => {
-        return <Paragraph ellipsis={{ rows: 3 }}>{comment}</Paragraph>
+        return (
+          <Paragraph className='!m-0' ellipsis={{ rows: 3 }}>
+            {comment}
+          </Paragraph>
+        )
       }
     },
     {
@@ -173,7 +182,11 @@ const FeedbackOrderTab: React.FC = () => {
       sorter: (a, b) => a.status.toString().localeCompare(b.status.toString()),
       render: (_, record) => {
         console.log(record)
-        return <Paragraph ellipsis={{ rows: 3 }}>{record.status ? 'Đang hiện' : 'Đã ẩn'}</Paragraph>
+        return (
+          <Paragraph className='!m-0' ellipsis={{ rows: 3 }}>
+            {record.status ? 'Đang hiện' : 'Đã ẩn'}
+          </Paragraph>
+        )
       },
       align: 'center'
     },
@@ -185,13 +198,13 @@ const FeedbackOrderTab: React.FC = () => {
     {
       key: 'action',
       fixed: 'right',
-      width: 100,
+      width: '10%',
       render: (_, record) => (
         <Space size='middle'>
           <FeedbackDetail id={record.id} />
-          <Link type='danger' href='https://ant.design' target='_blank'>
+          <Button type='link' loading={loading} onClick={() => hiddenFeedback(record.id)} target='_blank'>
             Ẩn
-          </Link>
+          </Button>
         </Space>
       )
     }
@@ -213,6 +226,24 @@ const FeedbackOrderTab: React.FC = () => {
     clearFilters()
     setSearchText('')
   }
+
+  const hiddenFeedback = async (id: any) => {
+    setLoading(true)
+    try {
+      const response = await hiddenFeedbackByIdAPI(id)
+      setLoading(false)
+      if (response) {
+        notification.success({ message: 'Sửa voucher thành công' })
+        dispatch(reFetchData())
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
+  }
+
   return (
     <Card bordered={false}>
       {feedbackError ? (

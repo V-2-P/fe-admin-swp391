@@ -16,6 +16,10 @@ export type User = {
   isActive: number
   createdAt: Date
   updatedAt: Date
+}
+
+export type Users = {
+  user: User
   orderQuantity: number
   bookingQuantity: number
   totalMoney: number

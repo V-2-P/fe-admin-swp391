@@ -34,6 +34,71 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
       notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
     }
   }
+
+  const fatherBirdDescription: DescriptionsProps['items'] = [
+    {
+      label: 'Tên ',
+      children: data?.bookingDetail.fatherBird.name,
+      span: 3
+    },
+    {
+      label: 'Phân loại',
+      children: data?.bookingDetail.fatherBird.category.name,
+      span: 3
+    },
+    {
+      label: 'Giống loài',
+      children: data?.bookingDetail.fatherBird.birdType.name,
+      span: 3
+    },
+    {
+      label: 'Tuổi',
+      children: data?.bookingDetail.fatherBird.age,
+      span: 3
+    },
+    {
+      label: 'Màu sắc',
+      children: data?.bookingDetail.fatherBird.color,
+      span: 3
+    },
+    {
+      label: 'Độ thuần chủng',
+      children: data?.bookingDetail.fatherBird.purebredLevel
+    }
+  ]
+
+  const motherBirdDescription: DescriptionsProps['items'] = [
+    {
+      label: 'Tên ',
+      children: data?.bookingDetail.motherBird.name,
+      span: 3
+    },
+    {
+      label: 'Phân loại',
+      children: data?.bookingDetail.motherBird.category.name,
+      span: 3
+    },
+    {
+      label: 'Giống loài',
+      children: data?.bookingDetail.motherBird.birdType.name,
+      span: 3
+    },
+    {
+      label: 'Tuổi',
+      children: data?.bookingDetail.motherBird.age,
+      span: 3
+    },
+    {
+      label: 'Màu sắc',
+      children: data?.bookingDetail.motherBird.color,
+      span: 3
+    },
+    {
+      label: 'Độ thuần chủng',
+      children: data?.bookingDetail.motherBird.purebredLevel
+    }
+  ]
+
   const userDescription: DescriptionsProps['items'] = [
     {
       label: 'Tên khách hàng',
@@ -88,6 +153,16 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
       >
         <Skeleton loading={loading} active paragraph={{ rows: 6 }}>
           <Row gutter={[16, 16]}>
+            <Col span={screens.md ? 12 : 24}>
+              <Card>
+                <Descriptions title='Thông tin chim bố' items={fatherBirdDescription} />
+              </Card>
+            </Col>
+            <Col span={screens.md ? 12 : 24}>
+              <Card>
+                <Descriptions title='Thông tin chim mẹ' items={motherBirdDescription} />
+              </Card>
+            </Col>
             <Col span={screens.md ? 12 : 24}>
               <Card>
                 <Descriptions title='Thông tin khách hàng' items={userDescription} />

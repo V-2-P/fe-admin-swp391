@@ -1,7 +1,7 @@
 import { Avatar, Button, Card, Col, Descriptions, Modal, Row, Skeleton, Tag, notification } from 'antd'
 import type { DescriptionsProps } from 'antd'
 import React, { useState } from 'react'
-import { User, getUserByIdAPI } from '~/utils/api'
+import { Users, getUserByIdAPI } from '~/utils/api'
 import { UserOutlined } from '@ant-design/icons'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 
@@ -12,7 +12,7 @@ type CustomerDetailType = {
 const CustomerDetail: React.FC<CustomerDetailType> = ({ id }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [data, setData] = useState<User>()
+  const [data, setData] = useState<Users>()
   const showModal = async (e: React.MouseEvent) => {
     e.preventDefault()
     setOpen(true)
@@ -34,33 +34,33 @@ const CustomerDetail: React.FC<CustomerDetailType> = ({ id }) => {
     {
       label: 'Avatar',
       children: (
-        <Avatar size={100} src={data?.imageUrl} icon={<UserOutlined />} crossOrigin='anonymous' alt='user-image' />
+        <Avatar size={100} src={data?.user.imageUrl} icon={<UserOutlined />} crossOrigin='anonymous' alt='user-image' />
       ),
       span: 3
     },
     {
       label: 'Tên',
-      children: data?.fullName,
+      children: data?.user.fullName,
       span: 1.5
     },
     {
       label: 'Role',
-      children: <Tag color='success'>{data?.roleEntity?.name}</Tag>,
+      children: <Tag color='success'>{data?.user.roleEntity?.name}</Tag>,
       span: 1.5
     },
     {
       label: 'Số điện thoại',
-      children: data?.phoneNumber,
+      children: data?.user.phoneNumber,
       span: 3
     },
     {
       label: 'Địa chỉ',
-      children: data?.address,
+      children: data?.user.address,
       span: 3
     },
     {
       label: 'Ngày sinh',
-      children: data?.dob,
+      children: data?.user.dob,
       span: 3
     },
     {

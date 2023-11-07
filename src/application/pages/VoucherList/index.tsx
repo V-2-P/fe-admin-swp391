@@ -28,56 +28,58 @@ const columns: ColumnsType<Voucher> = [
   {
     title: 'Mã voucher',
     dataIndex: 'code',
-    align: 'right'
+    align: 'left'
   },
   {
     title: 'Tên voucher',
     dataIndex: 'name',
-    align: 'right'
+    align: 'left'
   },
   {
     title: 'Ngày phát hành',
     dataIndex: 'createdAt',
     render: (_, { createdAt }) => formatDateToDDMMYYYY(new Date(createdAt)),
-    align: 'right'
+    align: 'left'
   },
   {
     title: 'Ngày hết hạn',
     dataIndex: 'expirationDate',
     render: (_, { createdAt }) => formatDateToDDMMYYYY(new Date(createdAt)),
-    align: 'right'
+    align: 'left'
   },
   {
     title: 'Ngày sử dụng',
     dataIndex: 'startDate',
     render: (_, { createdAt }) => formatDateToDDMMYYYY(new Date(createdAt)),
-    align: 'right'
+    align: 'left'
   },
   {
     title: 'Số lượng',
     dataIndex: 'amount',
     render: (_, { amount }) => formatCurrencyVNDToString(amount),
-    align: 'right'
+    align: 'center'
   },
   {
     title: 'Mệnh giá',
     dataIndex: 'discount',
     render: (_, { discount }) => formatCurrencyVND(discount),
-    align: 'right'
+    align: 'center'
   },
   {
     title: 'Trạng thái',
     dataIndex: 'status',
     render: (_, record) => {
+      let status
       if (record.status === 'isActive') {
-        return <Paragraph>Kích hoạt</Paragraph>
+        status = 'Kích hoạt'
       } else if (record.status === 'expired') {
-        return <Paragraph>Hết hạn</Paragraph>
+        status = 'Hết hạn'
       } else if (record.status === 'notActivated') {
-        return <Paragraph>Chưa kích hoạt</Paragraph>
+        status = 'Chưa kích hoạt'
       } else {
-        return <Paragraph>Đã hủy bỏ</Paragraph>
+        status = 'Hủy bỏ'
       }
+      return <Paragraph className='!m-0'>{status}</Paragraph>
     },
     align: 'left'
   }
@@ -95,7 +97,7 @@ const VoucherList: React.FC = () => {
   }, [loading, error, response])
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
-      <Space size='large' direction='vertical' className='w-full'>
+      <Space size='large' direction='vertical' className='w-full h-full'>
         <div className='flex flex-row justify-between items-center'>
           <Title level={3}>Danh sách voucher</Title>
           <AddVoucherForm />

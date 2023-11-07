@@ -31,6 +31,10 @@ type Staff = {
   isActive: number
 }
 
+interface Users {
+  user: Staff
+}
+
 type StaffIndex = keyof Staff
 
 const StaffList: React.FC = () => {
@@ -39,7 +43,7 @@ const StaffList: React.FC = () => {
   const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
   const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
   const [loading, error, response] = useFetchData(`/users?roleId=3&page=${page - 1}&limit=${limit}`)
-  const [data, setData] = useState<Staff[]>([])
+  const [data, setData] = useState<Users[]>([])
   const totalPages = response ? response.data.totalPages : 0
   const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
@@ -49,7 +53,7 @@ const StaffList: React.FC = () => {
   const handleDelete = async (id: number) => {
     const response = await deleteUserAPI(id)
     if (response) {
-      setData((prevData) => prevData.filter((staff) => staff.id !== id))
+      setData((prevData) => prevData.filter((staff) => staff.user.id !== id))
       notification.success({ message: 'Xóa nhân viên thành công' })
     } else {
       notification.error({ message: 'Sorry! Something went wrong. App server error' })
@@ -225,7 +229,7 @@ const StaffList: React.FC = () => {
                   columns={columns}
                   pagination={{ pageSize: limit, total: totalPages * limit, current: page }}
                   scroll={{ x: 800, y: 300 }}
-                  dataSource={data}
+                  dataSource={data.map((e: any) => e.user)}
                   onChange={onChange}
                 />
               )}
