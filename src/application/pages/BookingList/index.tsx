@@ -9,9 +9,9 @@ import { ColumnsType } from 'antd/lib/table'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import { User } from '~/utils/api'
-import BookingDetailModal from '~/application/components/bookingList/BookingDetail'
+import BookingDetailModal from '~/application/components/bookingList/bookingDetail'
 import { BookingDetail, BookingStatus } from '~/utils/api/booking'
-const { Title, Link } = Typography
+const { Title } = Typography
 
 interface Booking {
   createdAt: string
@@ -140,7 +140,7 @@ const BookingList: React.FC = () => {
       dataIndex: 'id',
       ...getColumnSearchProps('id'),
       sorter: (a, b) => a.id - b.id,
-      width: '17%'
+      width: '10%'
     },
     {
       title: 'Ngày đặt',
@@ -164,7 +164,7 @@ const BookingList: React.FC = () => {
       filters: filterStatus,
       onFilter: (value: any, record) => record.status.includes(value as string),
       sorter: (a, b) => a.status.localeCompare(b.status),
-      width: '17%'
+      width: '10%'
     },
     {
       title: 'Tổng tiền',
@@ -177,13 +177,10 @@ const BookingList: React.FC = () => {
     {
       key: 'action',
       fixed: 'right',
-      width: '10%',
+      width: '7%',
       render: (_, record) => (
         <Space size='middle'>
           <BookingDetailModal id={record.id} />
-          <Link type='danger' href='https://ant.design' target='_blank'>
-            Ẩn
-          </Link>
         </Space>
       )
     }
