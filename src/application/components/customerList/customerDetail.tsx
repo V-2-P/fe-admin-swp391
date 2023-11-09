@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { Users, getUserByIdAPI } from '~/utils/api'
 import { UserOutlined } from '@ant-design/icons'
 import { formatCurrencyVND } from '~/utils/numberUtils'
+import CustomerBooking from './customerBooking'
+import CustomerOrder from './customerOrder'
 
 type CustomerDetailType = {
   id: number
@@ -82,8 +84,8 @@ const CustomerDetail: React.FC<CustomerDetailType> = ({ id }) => {
       label: 'Action',
       children: (
         <>
-          <Button type='link'>Xem tổng đơn đặt hàng</Button>
-          <Button type='link'>Xem tổng đơn lai chim</Button>
+          <CustomerOrder id={id} />
+          <CustomerBooking id={id} />
         </>
       ),
       span: 3
