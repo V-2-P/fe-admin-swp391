@@ -1,50 +1,42 @@
 import { Button, Card, Col, Input, InputRef, Modal, Row, Space, TableProps, notification } from 'antd'
-import Table, { ColumnType } from 'antd/es/table'
-import { ColumnsType, FilterConfirmProps } from 'antd/es/table/interface'
-import { useRef, useState } from 'react'
+import Table, { ColumnType, ColumnsType } from 'antd/es/table'
+import { FilterConfirmProps } from 'antd/es/table/interface'
+import React, { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import { SearchOutlined } from '@ant-design/icons'
+import { getBookingByUserIdAPI } from '~/utils/api/booking'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
-import { getOrderByUserId } from '~/utils/api'
-import { formatCurrencyVND } from '~/utils/numberUtils'
-
-type OrderListByUserId = {
+type BookingListTypeByUserId = {
   id: number
 }
 
-type Order = {
+interface Booking {
+  createdAt: string
+  updatedAt: string
   id: number
-  userId: number
   fullName: string
+  bookingTime: string
   phoneNumber: string
   shippingAddress: string
-  note: string
-  totalMoney: number
-  totalPayment: number
-  discount: number
-  orderDate: string
   paymentMethod: string
-  shippingMethod: string
-  shippingMoney: number
-  shippingDate: string
-  trackingNumber: string
+  paymentDeposit: number
+  totalPayment: number
 }
 
-type DataIndex = keyof Order
+type DataIndex = keyof Booking
 
-const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
+const CustomerBooking: React.FC<BookingListTypeByUserId> = ({ id }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [data, setData] = useState<Order[]>([])
+  const [data, setData] = useState<Booking[]>([])
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
-  const searchInput = useRef<InputRef>(null)
   const showModal = async (e: React.MouseEvent) => {
     e.preventDefault()
     setOpen(true)
     setLoading(true)
     try {
-      const response = await getOrderByUserId(id)
+      const response = await getBookingByUserIdAPI(id)
       setLoading(false)
       if (response) {
         setData(response.data)
@@ -56,6 +48,7 @@ const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
       notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
     }
   }
+  const searchInput = useRef<InputRef>(null)
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
@@ -65,7 +58,12 @@ const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
     setSearchText(selectedKeys[0])
     setSearchedColumn(dataIndex)
   }
-  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Order> => ({
+
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters()
+    setSearchText('')
+  }
+  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Booking> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -136,12 +134,7 @@ const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
       )
   })
 
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters()
-    setSearchText('')
-  }
-
-  const onChange: TableProps<Order>['onChange'] = (pagination, filters, sorter, extra) => {
+  const onChange: TableProps<Booking>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
   }
   const handleOk = () => {
@@ -151,7 +144,7 @@ const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
     console.log('Clicked cancel button')
     setOpen(false)
   }
-  const columns: ColumnsType<Order> = [
+  const columns: ColumnsType<Booking> = [
     {
       title: 'Mã',
       dataIndex: 'id',
@@ -160,17 +153,17 @@ const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
       width: '20%'
     },
     {
-      title: 'Ngày đặt',
-      dataIndex: 'orderDate',
-      render: (_, { orderDate }) => formatDateToDDMMYYYY(new Date(orderDate)),
-      sorter: (a, b) => a.orderDate.localeCompare(b.orderDate),
+      title: 'Ngày tạo',
+      dataIndex: 'createdAt',
+      render: (_, { createdAt }) => formatDateToDDMMYYYY(new Date(createdAt)),
+      sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
       width: '20%'
     },
     {
       title: 'Tên',
       dataIndex: 'fullName',
       sorter: (a, b) => a.fullName.localeCompare(b.fullName),
-      width: '30%'
+      width: '20%'
     },
     {
       title: 'Phương thức đặt hàng',
@@ -179,17 +172,21 @@ const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
       width: '30%'
     },
     {
+      title: 'Tiền cọc',
+      dataIndex: 'paymentDeposit',
+      width: '15%'
+    },
+    {
       title: 'Tổng tiền',
       dataIndex: 'totalPayment',
-      render: (_, record) => formatCurrencyVND(record.totalMoney),
-      sorter: (a, b) => a.id - b.id,
       width: '15%'
     }
   ]
+  console.log(data)
   return (
     <div>
       <Button onClick={showModal} type='link'>
-        Xem tổng đơn đặt hàng
+        Xem tổng đơn lai chim
       </Button>
       <Modal
         title={`Đơn booking`}
@@ -236,4 +233,4 @@ const CustomerOrder: React.FC<OrderListByUserId> = ({ id }) => {
   )
 }
 
-export default CustomerOrder
+export default CustomerBooking
