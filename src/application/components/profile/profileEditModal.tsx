@@ -59,7 +59,7 @@ const ProfileEditModal: React.FC = () => {
         type='primary'
         size='large'
       >
-        Edit Profile
+        Cập nhật thông tin
       </Button>
       <Modal
         title='Cập nhật thông tin cá nhân'

@@ -26,8 +26,12 @@ type User = {
   isActive: number
 }
 
+type Users = {
+  user: User
+}
+
 type UserData = {
-  users: User[]
+  users: Users[]
   totalPages: number
 }
 
@@ -53,9 +57,9 @@ const UpdateStaff: React.FC = () => {
     const response = await searchUserAPI(search)
     console.log(response)
     const data: UserData = response.data
-    return data.users.map((user) => ({
-      label: user.email,
-      value: user.id
+    return data.users.map((element) => ({
+      label: element.user.email,
+      value: element.user.id
     }))
   }
   const handleChangeData = (newValue: OptionType) => {
@@ -100,19 +104,19 @@ const UpdateStaff: React.FC = () => {
     const fetchUser = async (id: number) => {
       setIsLoading(true)
       const res = await getUserByIdAPI(id)
-      const data: User = res.data
+      const data: Users = res.data
       form.setFieldsValue({
-        name: data.fullName,
+        name: data.user.fullName,
         inputCustomerId: {
-          value: data.id.toString(),
-          label: data.email
+          value: data.user.id.toString(),
+          label: data.user.email
         },
-        phone: data.phoneNumber,
-        email: data.email,
-        address: data.address,
+        phone: data.user.phoneNumber,
+        email: data.user.email,
+        address: data.user.address,
         isActive: {
-          value: data.isActive.toString(),
-          label: status.find((e) => e.value === data.isActive.toString())?.label
+          value: data.user.isActive.toString(),
+          label: status.find((e) => e.value === data.user.isActive.toString())?.label
         }
       })
       setIsLoading(false)

@@ -9,6 +9,7 @@ import useFetchData from '~/application/hooks/useFetchData'
 import { BirdCategory } from '../addBird/generalContainer'
 import { UpdateBirdPayload, updateBirdAPI } from '~/utils/api'
 import { OptionType } from '../shared/DebounceSelect'
+import UpdateImageContainer from './updateImageContainer'
 
 type BirdEditProps = {
   bird?: BirdDetail
@@ -110,7 +111,8 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
             purebredLevel: bird?.purebredLevel,
             typeId: birdTypes.find((e) => e.label === bird?.birdType)?.value,
             categoryId: birdCategory.find((e) => e.label === bird?.categoryName)?.value,
-            status: bird?.status
+            status: bird?.status,
+            thumbnail: bird?.thumbnail
           }}
           name='updatebird'
           labelCol={{ span: 8 }}
@@ -148,6 +150,7 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
                 >
                   <Select placeholder='Chọn giới tính' options={genders} size='large' />
                 </Form.Item>
+                <UpdateImageContainer />
                 <Form.Item<UpdateBirdPayload>
                   label='Giá tiền'
                   name='price'

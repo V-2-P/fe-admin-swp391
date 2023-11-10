@@ -52,7 +52,7 @@ const AddVoucherForm: React.FC = () => {
       const response = await addVoucherAPI(payload)
       setLoading(false)
       if (response) {
-        notification.success({ message: 'Sửa voucher thành công' })
+        notification.success({ message: 'Thêm voucher thành công' })
         form.resetFields()
         dispatch(reFetchData())
       } else {

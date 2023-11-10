@@ -8,27 +8,10 @@ import { ColumnFilterItem, FilterConfirmProps } from 'antd/es/table/interface'
 import { ColumnsType } from 'antd/lib/table'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
-import { User } from '~/utils/api'
 import BookingDetailModal from '~/application/components/bookingList/bookingDetail'
-import { BookingDetail, BookingStatus } from '~/utils/api/booking'
+import { Booking, BookingStatus } from '~/utils/api/booking'
+import AddEggButton from '~/application/components/bookingList/addEggButton'
 const { Title } = Typography
-
-interface Booking {
-  createdAt: string
-  updatedAt: string
-  id: number
-  user: User
-  fullName: string
-  bookingTime: string
-  phoneNumber: string
-  shippingAddress: string
-  paymentMethod: string
-  manager: User
-  status: string
-  paymentDeposit: number
-  totalPayment: number
-  bookingDetail: BookingDetail
-}
 
 type DataIndex = keyof Booking
 
@@ -177,9 +160,10 @@ const BookingList: React.FC = () => {
     {
       key: 'action',
       fixed: 'right',
-      width: '7%',
+      width: '15%',
       render: (_, record) => (
         <Space size='middle'>
+          <AddEggButton booking={record} />
           <BookingDetailModal id={record.id} />
         </Space>
       )
@@ -202,6 +186,7 @@ const BookingList: React.FC = () => {
     clearFilters()
     setSearchText('')
   }
+
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>

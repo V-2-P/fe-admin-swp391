@@ -172,21 +172,16 @@ const StaffList: React.FC = () => {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
-        <Space size='middle' direction='vertical' className='!w-full'>
-          <Row>
-            <Button type='link'>Xem</Button>
-            <Button
-              type='link'
-              onClick={() => {
-                navigate(`/updatestaff/${record.id}`)
-              }}
-            >
-              Cập nhật
-            </Button>
-          </Row>
-          <Row>
-            <DeleteButton onDelete={() => handleDelete(record.id)} />
-          </Row>
+        <Space size='middle' direction='horizontal' className='!w-full'>
+          <Button
+            type='link'
+            onClick={() => {
+              navigate(`/updatestaff/${record.id}`)
+            }}
+          >
+            Xem
+          </Button>
+          <DeleteButton onDelete={() => handleDelete(record.id)} />
         </Space>
       )
     }

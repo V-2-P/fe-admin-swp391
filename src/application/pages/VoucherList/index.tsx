@@ -44,13 +44,13 @@ const columns: ColumnsType<Voucher> = [
   {
     title: 'Ngày hết hạn',
     dataIndex: 'expirationDate',
-    render: (_, { createdAt }) => formatDateToDDMMYYYY(new Date(createdAt)),
+    render: (_, { expirationDate }) => formatDateToDDMMYYYY(new Date(expirationDate)),
     align: 'left'
   },
   {
     title: 'Ngày sử dụng',
     dataIndex: 'startDate',
-    render: (_, { createdAt }) => formatDateToDDMMYYYY(new Date(createdAt)),
+    render: (_, { startDate }) => formatDateToDDMMYYYY(new Date(startDate)),
     align: 'left'
   },
   {

@@ -47,3 +47,7 @@ export const updateUserAPI = async (id: number, data: UpdateUserPayload) => {
 export const deleteUserAPI = async (id: number) => {
   return await axiosClient.delete(APIs_URL.DELETE_USER(id))
 }
+
+export const updateStatusAPI = async (id: number, data: { isActive: string }) => {
+  return await axiosClient.put(APIs_URL.USER_ID(id), data)
+}

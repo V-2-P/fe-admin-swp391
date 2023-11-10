@@ -1,21 +1,21 @@
 import { Dayjs } from 'dayjs'
 
 export type User = {
-  id: number
-  fullName: string
-  phoneNumber: string
-  email: string
-  address: string
-  imageUrl: string
-  roleEntity: {
+  id?: number
+  fullName?: string
+  phoneNumber?: string
+  email?: string
+  address?: string
+  imageUrl?: string
+  roleEntity?: {
     id: number
     name: string
   }
-  emailVerified: boolean
-  dob: string
-  isActive: number
-  createdAt: Date
-  updatedAt: Date
+  emailVerified?: boolean
+  dob?: string
+  isActive?: number
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export type Users = {

@@ -8,6 +8,7 @@ import type { InputRef } from 'antd'
 import useFetchData from '~/application/hooks/useFetchData'
 import CustomerDetail from '~/application/components/customerList/customerDetail'
 import { useSearchParams } from 'react-router-dom'
+import BanCustomer from '~/application/components/customerList/banCustomer'
 
 const { Title } = Typography
 
@@ -150,15 +151,27 @@ const CustomerList: React.FC = () => {
       width: '15%'
     },
     {
+      title: 'Tình trạng',
+      dataIndex: 'isActive',
+      sorter: (a, b) => a.email.localeCompare(b.email),
+      render: (_, record) => {
+        let message
+        if (record.isActive === 1) {
+          message = 'Hiệu lực'
+        } else {
+          message = 'Vô hiệu'
+        }
+        return message
+      }
+    },
+    {
       title: 'Action',
       key: 'action',
       fixed: 'right',
       render: (_, record) => (
         <Space size='middle' direction='horizontal' className='!w-full'>
           <CustomerDetail id={record.id} />
-          <Button type='link' danger>
-            Khóa
-          </Button>
+          <BanCustomer id={record.id} isActive={record.isActive} />
         </Space>
       ),
       width: '15%'
