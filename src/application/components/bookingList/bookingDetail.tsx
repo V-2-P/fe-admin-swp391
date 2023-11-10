@@ -1,8 +1,11 @@
-import { Button, Card, Col, Descriptions, Grid, Modal, Row, Skeleton, notification } from 'antd'
-import { DescriptionsProps } from 'antd/lib'
+import { Button, Card, Col, Descriptions, Grid, Modal, Row, Skeleton, Typography, notification } from 'antd'
+import { ColumnsType } from 'antd/es/table'
+import { DescriptionsProps, Table } from 'antd/lib'
 import React, { useState } from 'react'
-import { Booking, getBookingByIdAPI } from '~/utils/api/booking'
+import { BirdPairing, Booking, getBookingByIdAPI } from '~/utils/api/booking'
 const { useBreakpoint } = Grid
+
+const { Title } = Typography
 
 type BookingDetailButtonType = {
   id: number
@@ -133,6 +136,36 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
       span: 3
     }
   ]
+  const orderColumns: ColumnsType<BirdPairing> = [
+    {
+      title: 'Mã',
+      dataIndex: 'id'
+    },
+    {
+      title: 'Tên',
+      dataIndex: 'newBird.name'
+    },
+    {
+      title: 'Phân loại',
+      dataIndex: 'newBird.category.name'
+    },
+    {
+      title: 'Giống loài',
+      dataIndex: 'newBird.birdType.name'
+    },
+    {
+      title: 'Màu sắc',
+      dataIndex: 'newBird.color'
+    },
+    {
+      title: 'Giới tính',
+      dataIndex: 'newBird.gender'
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status'
+    }
+  ]
   return (
     <div>
       <Button type='link' onClick={showModal}>
@@ -162,6 +195,24 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
               <Card>
                 <Descriptions title='Thông tin chim mẹ' items={motherBirdDescription} />
               </Card>
+            </Col>
+            <Col span={24}>
+              <div className='flex flex-row justify-between items-center'>
+                <Title level={3}>Thông tin chim lai</Title>
+              </div>
+              <Table
+                onRow={(record, rowIndex) => {
+                  return {
+                    className: 'cursor-pointer',
+                    onClick: () => {
+                      console.log(record, rowIndex)
+                    }
+                  }
+                }}
+                columns={orderColumns}
+                dataSource={data ? data.bookingDetail?.birdPairing : []}
+                pagination={false}
+              />
             </Col>
             <Col span={screens.md ? 12 : 24}>
               <Card>

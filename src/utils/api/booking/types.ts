@@ -91,41 +91,42 @@ export interface BookingDetail {
     }[]
   }
   status: string
-  birdPairing: {
+  birdPairing: BirdPairing[]
+}
+
+export interface BirdPairing {
+  createdAt: string
+  updatedAt: string
+  id: number
+  newBird: {
     createdAt: string
     updatedAt: string
     id: number
-    newBird: {
-      createdAt: string
-      updatedAt: string
+    name: string
+    price: number
+    thumbnail: string
+    description: string
+    category: {
       id: number
       name: string
-      price: number
-      thumbnail: string
-      description: string
-      category: {
-        id: number
-        name: string
-      }
-      birdType: {
-        id: number
-        name: string
-      }
-      status: boolean
-      purebredLevel: string
-      competitionAchievements: number
-      age: string
-      gender: string
-      color: string
-      quantity: number
-      birdImages: {
-        id: number
-        imageUrl: string
-      }[]
     }
-    bookingDetail: string
-    status: string
-  }[]
+    birdType: {
+      id: number
+      name: string
+    }
+    status: boolean
+    purebredLevel: string
+    competitionAchievements: number
+    age: string
+    gender: string
+    color: string
+    quantity: number
+    birdImages: {
+      id: number
+      imageUrl: string
+    }[]
+  }
+  status: string
 }
 
 export interface Booking {

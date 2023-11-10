@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Descriptions, Avatar, Tag, Tooltip, Upload, App, Row, Col, Card, Skeleton, Result } from 'antd'
+import { Button, Descriptions, Avatar, Tag, Tooltip, Upload, App, Row, Col, Card, Skeleton, Result, Space } from 'antd'
 import type { UploadFile, UploadProps } from 'antd'
 import { RcFile, UploadChangeParam } from 'antd/es/upload'
 import ImgCrop from 'antd-img-crop'
@@ -9,6 +9,7 @@ import useFetchData from '~/application/hooks/useFetchData'
 import { getRoleColor } from '~/utils/roleUtils'
 import { User, uploadAvatarAPI } from '~/utils/api'
 import ProfileEditModal from '~/application/components/profile/profileEditModal'
+import UpdatePasswordModal from '~/application/components/profile/updatePasswordModal'
 
 const Profile: React.FC = () => {
   const { message } = App.useApp()
@@ -65,7 +66,16 @@ const Profile: React.FC = () => {
               {error ? (
                 <Result title='Failed to fetch' subTitle={error} status='error' />
               ) : (
-                <Descriptions title='Profile Information' bordered extra={<ProfileEditModal />}>
+                <Descriptions
+                  title='Thông tin cá nhân'
+                  bordered
+                  extra={
+                    <Space>
+                      <UpdatePasswordModal />
+                      <ProfileEditModal />
+                    </Space>
+                  }
+                >
                   <Descriptions.Item label='Avatar' span={3}>
                     <Avatar
                       size={100}
@@ -106,9 +116,9 @@ const Profile: React.FC = () => {
                   <Descriptions.Item label='Vai trò' span={2}>
                     <Tag
                       style={{ width: '80px', textAlign: 'center', textTransform: 'capitalize' }}
-                      color={getRoleColor(data?.roleEntity.name).color}
+                      color={getRoleColor(data?.roleEntity!.name).color}
                     >
-                      {getRoleColor(data?.roleEntity.name).name}
+                      {getRoleColor(data?.roleEntity!.name).name}
                     </Tag>
                   </Descriptions.Item>
 
