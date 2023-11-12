@@ -11,6 +11,7 @@ import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import BookingDetailModal from '~/application/components/bookingList/bookingDetail'
 import { Booking, BookingStatus } from '~/utils/api/booking'
 import AddEggButton from '~/application/components/bookingList/addEggButton'
+import UpdateBookingStatus from '~/application/components/bookingList/updateBookingStatus'
 const { Title } = Typography
 
 type DataIndex = keyof Booking
@@ -147,6 +148,7 @@ const BookingList: React.FC = () => {
       filters: filterStatus,
       onFilter: (value: any, record) => record.status.includes(value as string),
       sorter: (a, b) => a.status.localeCompare(b.status),
+      render: (_, record) => <UpdateBookingStatus status={record.status} id={record.id} />,
       width: '10%'
     },
     {

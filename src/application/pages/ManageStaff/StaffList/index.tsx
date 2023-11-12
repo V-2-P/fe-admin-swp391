@@ -156,7 +156,6 @@ const StaffList: React.FC = () => {
       dataIndex: 'email',
       sorter: (a, b) => a.email.localeCompare(b.email)
     },
-
     {
       title: 'SĐT',
       dataIndex: 'phoneNumber',

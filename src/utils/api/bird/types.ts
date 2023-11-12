@@ -32,3 +32,12 @@ export type UpdateBirdPayload = {
   gender?: string
   color?: string
 }
+
+export type BirdImage = {
+  files?: string[]
+}
+
+export type BirdImageList = {
+  id: number
+  imageUrl: string
+}

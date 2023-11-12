@@ -150,7 +150,6 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
                 >
                   <Select placeholder='Chọn giới tính' options={genders} size='large' />
                 </Form.Item>
-                <UpdateImageContainer />
                 <Form.Item<UpdateBirdPayload>
                   label='Giá tiền'
                   name='price'
@@ -206,6 +205,7 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
             )}
           </Skeleton>
         </Form>
+        <UpdateImageContainer id={bird!.id} bird_images={bird!.bird_images} />
       </Modal>
     </>
   )

@@ -25,6 +25,7 @@ import CommonLayout from '../layouts/common'
 import PrivateRoute from '../components/route/PrivateRoute'
 import PublicRoute from '../components/route/PublicRoute'
 import BookingList from '../pages/BookingList'
+import BookingDelivery from '../pages/Delivery/Booking'
 
 const Wrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
   const location = useLocation()
@@ -64,6 +65,7 @@ const Router: React.FC = () => {
                 <Route path='/voucherlist' element={<VoucherList />} />
                 <Route path='/shipmentlist' element={<ShipmentList />} />
                 <Route path='/bookinglist' element={<BookingList />} />
+                <Route path='/bookingdelivery' element={<BookingDelivery />} />
               </Route>
             </Route>
 

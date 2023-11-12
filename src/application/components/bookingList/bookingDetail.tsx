@@ -3,6 +3,7 @@ import { ColumnsType } from 'antd/es/table'
 import { DescriptionsProps, Table } from 'antd/lib'
 import React, { useState } from 'react'
 import { BirdPairing, Booking, getBookingByIdAPI } from '~/utils/api/booking'
+import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 const { useBreakpoint } = Grid
 
 const { Title } = Typography
@@ -139,31 +140,21 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
   const orderColumns: ColumnsType<BirdPairing> = [
     {
       title: 'Mã',
+      width: '30%',
       dataIndex: 'id'
     },
     {
-      title: 'Tên',
-      dataIndex: 'newBird.name'
-    },
-    {
-      title: 'Phân loại',
-      dataIndex: 'newBird.category.name'
-    },
-    {
-      title: 'Giống loài',
-      dataIndex: 'newBird.birdType.name'
-    },
-    {
-      title: 'Màu sắc',
-      dataIndex: 'newBird.color'
-    },
-    {
-      title: 'Giới tính',
-      dataIndex: 'newBird.gender'
+      title: 'Ngày tạo',
+      dataIndex: 'createdAt',
+      render: (_, { createdAt }) => {
+        return formatDateToDDMMYYYY(new Date(createdAt))
+      },
+      width: '40%'
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'status'
+      dataIndex: 'status',
+      width: '30%'
     }
   ]
   return (

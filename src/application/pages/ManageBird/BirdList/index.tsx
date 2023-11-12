@@ -168,6 +168,11 @@ const BirdList: React.FC = () => {
   })
   const columns: ColumnsType<Bird> = [
     {
+      title: 'Mã chim',
+      dataIndex: 'id',
+      sorter: (a, b) => a.id - b.id
+    },
+    {
       title: 'Tên',
       dataIndex: 'name',
       ...getColumnSearchProps('name'),
