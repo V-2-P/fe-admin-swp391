@@ -1,15 +1,37 @@
 import React, { useState } from 'react'
-import { Form, Upload, App } from 'antd'
+import { Form, Upload, App, notification } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import type { UploadFile, UploadProps } from 'antd'
 import { RcFile } from 'antd/es/upload'
 // import { getBase64 } from '~/utils/imageUtils'
-import { UpdateBirdPayload } from '~/utils/api'
+import { BirdImage, deleteBirdImageAPI, addBirdImageAPI } from '~/utils/api'
+import { useAppDispatch } from '~/application/hooks/reduxHook'
+import { reFetchData } from '~/redux/slices'
+import { getBirdImage } from '~/utils/imageUtils'
 
-const UpdateImageContainer: React.FC = () => {
+type BirdImages = {
+  id: number
+  imageUrl: string
+}
+
+type BirdEditProps = {
+  id: number
+  bird_images: BirdImages[]
+}
+
+const UpdateImageContainer: React.FC<BirdEditProps> = ({ id, bird_images }) => {
   const { message } = App.useApp()
   // const [imageUrl, setImageUrl] = useState<string>()
-  const [fileImages, setFileImages] = useState<UploadFile[]>([])
+  const [fileImages, setFileImages] = useState<UploadFile[]>(
+    bird_images.map((e) => ({
+      uid: e.id.toString(),
+      name: e.imageUrl,
+      status: 'done',
+      url: getBirdImage(e.imageUrl)
+    }))
+  )
+  const [form] = Form.useForm()
+  const dispatch = useAppDispatch()
   const normFile1 = (e: any) => {
     console.log('Upload event:', e)
     if (Array.isArray(e)) {
@@ -46,11 +68,35 @@ const UpdateImageContainer: React.FC = () => {
     const imgWindow = window.open(src)
     imgWindow?.document.write(image.outerHTML)
   }
+  const onRemove = async (file: UploadFile) => {
+    try {
+      const response = await deleteBirdImageAPI(file.uid)
+      if (response) {
+        dispatch(reFetchData())
+      } else {
+        console.log('1')
+      }
+    } catch (err) {
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
+  }
   const uploadImagesProps: UploadProps = {
     type: fileImages.length === 0 ? 'drag' : 'select',
     name: 'fileImages',
     multiple: true,
     listType: 'picture-card',
+    customRequest: async (options: any) => {
+      try {
+        const data = {
+          imageFile: options.file
+        }
+        const res = await addBirdImageAPI(id, data)
+        dispatch(reFetchData())
+        console.log(res)
+      } catch (err) {
+        console.log(err)
+      }
+    },
     beforeUpload: (file: RcFile) => {
       const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
       if (!isJpgOrPng) {
@@ -65,7 +111,8 @@ const UpdateImageContainer: React.FC = () => {
     },
     fileList: fileImages,
     onChange: onChangeImages,
-    onPreview: onPreview
+    onPreview: onPreview,
+    onRemove: onRemove
   }
   //   const uploadThumbnailProps: UploadProps = {
   //     type: 'drag',
@@ -90,27 +137,51 @@ const UpdateImageContainer: React.FC = () => {
   //         onSuccess!('ok')
   //       }, 0)
   //     }
+  //
+
+  // const onUpload = async (values: BirdImage) => {
+  //   const payload: BirdImage = {
+  //     ...(values.files &&
+  //       values.files.length > 0 && {
+  //         files: values.files.map((image: any) => image.originFileObj)
+  //       })
   //   }
+  //   try {
+  //     const response = await a(id, payload)
+  //     if (response) {
+  //       notification.success({ message: 'Cập chim thành công' })
+  //       dispatch(reFetchData())
+  //     } else {
+  //       notification.error({ message: 'Cập chim thất bại' })
+  //     }
+  //   } catch (err) {
+  //     notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+  //   }
+  // }
+
+  console.log(id)
 
   return (
     <>
-      <Form.Item<UpdateBirdPayload> label='Hình ảnh'>
-        <Form.Item name='imagesFile' valuePropName='fileImages' getValueFromEvent={normFile1} noStyle>
-          <Upload {...uploadImagesProps}>
-            {fileImages.length === 0 ? (
-              <>
-                <p className='ant-upload-drag-icon'>
-                  <InboxOutlined />
-                </p>
-                <p className='ant-upload-text'>Click or drag file to this area to upload</p>
-                <p className='ant-upload-hint'>Support for a single or bulk upload.</p>
-              </>
-            ) : (
-              '+ Upload'
-            )}
-          </Upload>
+      <Form form={form}>
+        <Form.Item<BirdImage> label='Hình ảnh'>
+          <Form.Item name='files' valuePropName='fileImages' getValueFromEvent={normFile1} noStyle>
+            <Upload {...uploadImagesProps}>
+              {fileImages.length === 0 ? (
+                <>
+                  <p className='ant-upload-drag-icon'>
+                    <InboxOutlined />
+                  </p>
+                  <p className='ant-upload-text'>Click or drag file to this area to upload</p>
+                  <p className='ant-upload-hint'>Support for a single or bulk upload.</p>
+                </>
+              ) : (
+                '+ Upload'
+              )}
+            </Upload>
+          </Form.Item>
         </Form.Item>
-      </Form.Item>
+      </Form>
       {/* <Form.Item
         label='Ảnh nhỏ'
         name='imageThumbnail'

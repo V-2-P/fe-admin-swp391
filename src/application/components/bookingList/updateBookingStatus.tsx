@@ -1,5 +1,6 @@
 import { App, Dropdown, Spin, Tag } from 'antd'
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 import { reFetchData } from '~/redux/slices'
 import { BookingStatus, updateBookingStatusAPI } from '~/utils/api/booking'
@@ -8,13 +9,13 @@ type UpdateBookingStatusProps = {
   status: BookingStatus | string
   id: number
 }
-const options = [{ value: BookingStatus.pending }]
-export const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id }) => {
+const options = [{ value: BookingStatus.shipping }]
+const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id }) => {
   const [currentStatus, setCurrentStatus] = useState<BookingStatus | string>(status)
   const [loading, setLoading] = useState<boolean>(false)
   const { notification } = App.useApp()
   const dispatch = useAppDispatch()
-
+  console.log(status)
   const items = options.map((option) => ({
     label: (
       <Tag bordered={false} color={getBookingStatus(option.value).color}>
@@ -57,9 +58,20 @@ export const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status
       </Spin>
     )
   }
+  if (currentStatus === BookingStatus.shipping) {
+    return (
+      <Link to={`/delivery/${id}`}>
+        <Tag bordered={false} color={getBookingStatus(currentStatus).color}>
+          {getBookingStatus(currentStatus).name}
+        </Tag>
+      </Link>
+    )
+  }
   return (
     <Tag bordered={false} color={getBookingStatus(currentStatus).color}>
       {getBookingStatus(currentStatus).name}
     </Tag>
   )
 }
+
+export default UpdateBookingStatus

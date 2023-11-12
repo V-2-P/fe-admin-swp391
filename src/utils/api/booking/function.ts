@@ -4,7 +4,7 @@ const APIs_URL = {
   BOOKING: '/booking',
   BOOKING_ID: (id: number) => `/booking/${id}`,
   BOOKING_STATUS: (status: string) => `/booking?status=${status}`,
-  BOOKING_UPDATE_STATUS: (id: number, status: string) => `/booking/${id}/${status}`,
+  BOOKING_UPDATE_STATUS: (id: number, status: string) => `/booking/${id}/status?status=${status}`,
   BOOKING_USERID: (id: number) => `booking/users/${id}`,
   ADD_BIRDPAIRING: `birdparing?bookingDetailId`
 }

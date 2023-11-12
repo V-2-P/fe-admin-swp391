@@ -1,10 +1,10 @@
 export enum BookingStatus {
-  pending = 'pending',
-  confirmed = 'confirmed',
-  preparing = 'preparing',
-  shipping = 'shipping',
-  delivered = 'delivered',
-  cancelled = 'cancelled'
+  pending = 'Pending',
+  confirmed = 'Confirmed',
+  preparing = 'Preparing',
+  shipping = 'Shipping',
+  delivered = 'Delivered',
+  cancelled = 'Cancelled'
 }
 
 export interface User {
@@ -140,7 +140,7 @@ export interface Booking {
   shippingAddress: string
   paymentMethod: string
   manager: User
-  status: BookingStatus
+  status: string
   paymentDeposit: number
   totalPayment: number
   bookingDetail: BookingDetail
