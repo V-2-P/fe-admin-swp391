@@ -130,7 +130,7 @@ const FeedbackOrderTab: React.FC = () => {
       sorter: (a, b) => a.rating - b.rating,
       render: (_, { rating }) => {
         return (
-          <div className='flex flex-row gap-1 items-center justify-center'>
+          <div>
             {rating === 0 ? <StarFilled /> : <StarFilled className='!text-orange-500' />}
             <span>{rating.toPrecision(2)}</span>
           </div>
@@ -163,7 +163,7 @@ const FeedbackOrderTab: React.FC = () => {
         }
       ],
       onFilter: (value, record) => record.rating === value,
-      align: 'center'
+      align: 'left'
     },
     {
       title: 'Đánh giá',

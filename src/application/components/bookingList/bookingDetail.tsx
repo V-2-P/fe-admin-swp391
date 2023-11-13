@@ -1,9 +1,10 @@
-import { Button, Card, Col, Descriptions, Grid, Modal, Row, Skeleton, Typography, notification } from 'antd'
+import { Button, Card, Col, Descriptions, Grid, Modal, Row, Skeleton, Space, Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { DescriptionsProps, Table } from 'antd/lib'
 import React, { useState } from 'react'
 import { BirdPairing, Booking, getBookingByIdAPI } from '~/utils/api/booking'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
+import BirdDetail from '../birdList/birdDetail'
 const { useBreakpoint } = Grid
 
 const { Title } = Typography
@@ -139,9 +140,16 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
   ]
   const orderColumns: ColumnsType<BirdPairing> = [
     {
-      title: 'Mã',
-      width: '30%',
+      title: 'Mã đơn hàng',
+      width: '20%',
       dataIndex: 'id'
+    },
+    {
+      title: 'Mã chim',
+      width: '10%',
+      render: (_, record) => {
+        return record.newBird.id
+      }
     },
     {
       title: 'Ngày tạo',
@@ -149,12 +157,18 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
       render: (_, { createdAt }) => {
         return formatDateToDDMMYYYY(new Date(createdAt))
       },
-      width: '40%'
+      width: '20%'
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       width: '30%'
+    },
+    {
+      title: 'Action',
+      render: (_, record) => (
+        <Space size='middle'>{record.status === 'Fledgling' ? <BirdDetail id={record.newBird.id} /> : <></>}</Space>
+      )
     }
   ]
   return (

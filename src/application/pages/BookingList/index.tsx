@@ -20,7 +20,6 @@ const BookingList: React.FC = () => {
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const [loadingBooking, errorBooking, responseBooking] = useFetchData('/booking')
-  console.log(responseBooking?.data)
   const searchInput = useRef<InputRef>(null)
   const filterStatus: ColumnFilterItem[] = [
     {

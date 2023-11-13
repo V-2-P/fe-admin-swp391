@@ -1,4 +1,4 @@
-import { Button, Card, Input, InputRef, Result, Space, TableProps, Typography } from 'antd'
+import { Button, Card, Input, InputRef, Result, Space, TableProps, Typography, notification } from 'antd'
 import Table, { ColumnType } from 'antd/es/table'
 import { FilterConfirmProps } from 'antd/es/table/interface'
 import React, { useRef, useState } from 'react'
@@ -6,7 +6,11 @@ import Highlighter from 'react-highlight-words'
 import { SearchOutlined, StarFilled } from '@ant-design/icons'
 import useFetchData from '~/application/hooks/useFetchData'
 import { ColumnsType } from 'antd/lib/table'
-import FeedbackDetail from '../Order/feedbackOrderDetail'
+import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
+import FeedbackBookingDetail from './feedbackBookingDetail'
+import { hiddenFeedbackBookingAPI } from '~/utils/api/feedback'
+import { useAppDispatch } from '~/application/hooks/reduxHook'
+import { reFetchData } from '~/redux/slices'
 const { Paragraph } = Typography
 
 interface DataType {
@@ -37,7 +41,8 @@ const FeedbackBookingTab: React.FC = () => {
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const [feedbackLoading, feedbackError, feedbackResponse] = useFetchData('/feedbackbooking')
-  console.log(feedbackResponse)
+  const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
   const searchInput = useRef<InputRef>(null)
   const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Booking> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -126,6 +131,22 @@ const FeedbackBookingTab: React.FC = () => {
     clearFilters()
     setSearchText('')
   }
+  const hiddenFeedback = async (id: any) => {
+    setLoading(true)
+    try {
+      const response = await hiddenFeedbackBookingAPI(id)
+      setLoading(false)
+      if (response) {
+        notification.success({ message: 'Sửa voucher thành công' })
+        dispatch(reFetchData())
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
+  }
 
   const columns: ColumnsType<Booking> = [
     {
@@ -137,7 +158,10 @@ const FeedbackBookingTab: React.FC = () => {
     {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
-      sorter: (a, b) => a.createdAt.localeCompare(b.createdAt)
+      sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
+      render: (_, { createdAt }) => {
+        return formatDateToDDMMYYYY(new Date(createdAt))
+      }
     },
     {
       title: 'Số sao',
@@ -145,7 +169,7 @@ const FeedbackBookingTab: React.FC = () => {
       sorter: (a, b) => a.rating - b.rating,
       render: (_, { rating }) => {
         return (
-          <div className='flex flex-row gap-1 items-center justify-center'>
+          <div className='flex flex-row gap-1'>
             {rating === 0 ? <StarFilled /> : <StarFilled className='!text-orange-500' />}
             <span>{rating.toPrecision(2)}</span>
           </div>
@@ -178,7 +202,7 @@ const FeedbackBookingTab: React.FC = () => {
         }
       ],
       onFilter: (value, record) => record.rating === value,
-      align: 'center'
+      align: 'left'
     },
     {
       title: 'Đánh giá',
@@ -195,22 +219,17 @@ const FeedbackBookingTab: React.FC = () => {
         console.log(record)
         return <Paragraph ellipsis={{ rows: 3 }}>{record.isActive ? 'Đang hiện' : 'Đã ẩn'}</Paragraph>
       },
-      align: 'center'
-    },
-    {
-      title: 'Người đánh giá',
-      dataIndex: 'booking.fullName',
-      sorter: (a, b) => a.booking.fullName.localeCompare(b.booking.fullName)
+      align: 'left'
     },
     {
       key: 'action',
       fixed: 'right',
-      width: '10%',
+      width: '15%',
       render: (_, record) => (
         <Space size='middle'>
-          <FeedbackDetail id={record.id} />
-          <Button type='link' target='_blank'>
-            Ẩn
+          <FeedbackBookingDetail id={record.id} />
+          <Button type='link' loading={loading} onClick={() => hiddenFeedback(record.id)} target='_blank'>
+            {record.isActive ? 'Ẩn' : 'Hiện'}
           </Button>
         </Space>
       )

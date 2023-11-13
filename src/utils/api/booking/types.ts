@@ -1,3 +1,5 @@
+import { BirdDetail } from '~/application/components/birdList/birdDetail'
+
 export enum BookingStatus {
   pending = 'Pending',
   confirmed = 'Confirmed',
@@ -98,34 +100,7 @@ export interface BirdPairing {
   createdAt: string
   updatedAt: string
   id: number
-  newBird: {
-    createdAt: string
-    updatedAt: string
-    id: number
-    name: string
-    price: number
-    thumbnail: string
-    description: string
-    category: {
-      id: number
-      name: string
-    }
-    birdType: {
-      id: number
-      name: string
-    }
-    status: boolean
-    purebredLevel: string
-    competitionAchievements: number
-    age: string
-    gender: string
-    color: string
-    quantity: number
-    birdImages: {
-      id: number
-      imageUrl: string
-    }[]
-  }
+  newBird: BirdDetail
   status: string
 }
 

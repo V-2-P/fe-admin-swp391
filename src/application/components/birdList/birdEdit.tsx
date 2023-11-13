@@ -12,11 +12,12 @@ import { OptionType } from '../shared/DebounceSelect'
 import UpdateImageContainer from './updateImageContainer'
 
 type BirdEditProps = {
-  bird?: BirdDetail
+  bird?: any
   setBird: (bird?: BirdDetail) => void
 }
 
 const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
+  console.log(bird)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const dispatch = useAppDispatch()
@@ -205,7 +206,7 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
             )}
           </Skeleton>
         </Form>
-        <UpdateImageContainer id={bird!.id} bird_images={bird!.bird_images} />
+        <UpdateImageContainer id={bird.id} bird_images={bird.bird_images} />
       </Modal>
     </>
   )

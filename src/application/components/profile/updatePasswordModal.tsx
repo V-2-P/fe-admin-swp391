@@ -87,7 +87,7 @@ const UpdatePasswordModal: React.FC = () => {
             <Input type='password' />
           </Form.Item>
           <Form.Item wrapperCol={{ span: 100 }}>
-            <Button type='primary' loading={loading} htmlType='submit' className='!w-full !bg-green-700'>
+            <Button type='primary' loading={loading} htmlType='submit' className='!w-full'>
               Đổi mật khẩu
             </Button>
           </Form.Item>

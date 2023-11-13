@@ -60,13 +60,13 @@ const BirdList: React.FC = () => {
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
   const filterCategory: ColumnFilterItem[] = response
-    ? Array.from(new Set(data.map((item) => item.category.name))).map((category) => ({
+    ? Array.from(new Set(data.map((item) => item.category?.name))).map((category) => ({
         value: category,
         text: category
       }))
     : []
   const filterBirdType: ColumnFilterItem[] = response
-    ? Array.from(new Set(data.map((item) => item.birdType.name))).map((birdtype) => ({
+    ? Array.from(new Set(data.map((item) => item.birdType?.name))).map((birdtype) => ({
         value: birdtype,
         text: birdtype
       }))
@@ -170,13 +170,14 @@ const BirdList: React.FC = () => {
     {
       title: 'Mã chim',
       dataIndex: 'id',
-      sorter: (a, b) => a.id - b.id
+      sorter: (a, b) => a.id - b.id,
+      ...getColumnSearchProps('id')
     },
     {
       title: 'Tên',
       dataIndex: 'name',
       ...getColumnSearchProps('name'),
-      sorter: (a, b) => a.name.localeCompare(b.name)
+      sorter: (a, b) => a?.name.localeCompare(b?.name)
     },
     {
       title: 'Danh mục',
@@ -184,9 +185,9 @@ const BirdList: React.FC = () => {
       filters: filterCategory,
       // filterMode: 'tree',
       filterSearch: true,
-      onFilter: (value: any, record) => record.category.name.includes(value as string),
-      sorter: (a, b) => a.category.name.localeCompare(b.category.name),
-      render: (_, { category }) => category.name
+      onFilter: (value: any, record) => record.category?.name.includes(value as string),
+      sorter: (a, b) => a.category?.name.localeCompare(b.category?.name),
+      render: (_, { category }) => category?.name
     },
     {
       title: 'Loài chim',
@@ -194,9 +195,9 @@ const BirdList: React.FC = () => {
       filters: filterBirdType,
       // filterMode: 'tree',
       filterSearch: true,
-      onFilter: (value: any, record) => record.birdType.name.includes(value as string),
-      sorter: (a, b) => a.birdType.name.localeCompare(b.birdType.name),
-      render: (_, { birdType }) => birdType.name
+      onFilter: (value: any, record) => record.birdType?.name.includes(value as string),
+      sorter: (a, b) => a.birdType?.name.localeCompare(b.birdType?.name),
+      render: (_, { birdType }) => birdType?.name
     },
     {
       title: 'Số lượng',
