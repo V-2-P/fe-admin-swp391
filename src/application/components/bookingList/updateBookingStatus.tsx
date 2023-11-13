@@ -1,6 +1,6 @@
 import { App, Dropdown, Spin, Tag } from 'antd'
+import type { MenuProps } from 'antd/lib'
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 import { reFetchData } from '~/redux/slices'
 import { BookingStatus, updateBookingStatusAPI } from '~/utils/api/booking'
@@ -9,14 +9,13 @@ type UpdateBookingStatusProps = {
   status: BookingStatus | string
   id: number
 }
-const options = [{ value: BookingStatus.shipping }]
+const options = [{ value: BookingStatus.confirmed }, { value: BookingStatus.preparing }]
 const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id }) => {
   const [currentStatus, setCurrentStatus] = useState<BookingStatus | string>(status)
   const [loading, setLoading] = useState<boolean>(false)
   const { notification } = App.useApp()
   const dispatch = useAppDispatch()
-  console.log(status)
-  const items = options.map((option) => ({
+  const items: MenuProps['items'] = options.map((option) => ({
     label: (
       <Tag bordered={false} color={getBookingStatus(option.value).color}>
         {getBookingStatus(option.value).name}
@@ -28,11 +27,11 @@ const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id })
   const handleChangeStatus = async (e: any) => {
     setLoading(true)
     try {
-      const response = await updateBookingStatusAPI(id, status)
+      const response = await updateBookingStatusAPI(id, e)
       setLoading(false)
       if (response) {
         notification.success({ message: 'Cập nhật trạng thái thành công' })
-        setCurrentStatus(e.key)
+        setCurrentStatus(e)
         dispatch(reFetchData())
       } else {
         notification.error({ message: 'Sorry! Something went wrong. App server error' })
@@ -42,35 +41,19 @@ const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id })
       notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
     }
   }
-  if (currentStatus === BookingStatus.pending) {
-    return (
-      <Spin spinning={loading}>
-        <Dropdown
-          menu={{ items, onClick: handleChangeStatus }}
-          trigger={['click']}
-          placement='bottomRight'
-          className='cursor-pointer'
-        >
+  const onClick: MenuProps['onClick'] = ({ key }) => {
+    handleChangeStatus(key)
+  }
+  return (
+    <Spin spinning={loading}>
+      <Dropdown menu={{ items, onClick }} trigger={['click']} placement='bottomRight' className='cursor-pointer'>
+        <a onClick={(e) => e.preventDefault()}>
           <Tag bordered={false} color={getBookingStatus(currentStatus).color}>
             {getBookingStatus(currentStatus).name}
           </Tag>
-        </Dropdown>
-      </Spin>
-    )
-  }
-  if (currentStatus === BookingStatus.shipping) {
-    return (
-      <Link to={`/delivery/${id}`}>
-        <Tag bordered={false} color={getBookingStatus(currentStatus).color}>
-          {getBookingStatus(currentStatus).name}
-        </Tag>
-      </Link>
-    )
-  }
-  return (
-    <Tag bordered={false} color={getBookingStatus(currentStatus).color}>
-      {getBookingStatus(currentStatus).name}
-    </Tag>
+        </a>
+      </Dropdown>
+    </Spin>
   )
 }
 
