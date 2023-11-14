@@ -1,4 +1,4 @@
-import { Button, Card, Col, Input, InputRef, Result, Row, Space, Tag, Typography } from 'antd'
+import { Button, Card, Col, Input, InputRef, Result, Row, Space, Tag, Typography, notification } from 'antd'
 import Table, { ColumnType, TableProps } from 'antd/es/table'
 import React, { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
@@ -9,7 +9,7 @@ import { ColumnsType } from 'antd/lib/table'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import BookingDetailModal from '~/application/components/bookingList/bookingDetail'
-import { Booking, BookingStatus } from '~/utils/api/booking'
+import { Booking, BookingStatus, getBookingByIdAPI } from '~/utils/api/booking'
 import AddEggButton from '~/application/components/bookingList/addEggButton'
 import { getBookingStatus } from '~/utils/statusUtils'
 import { useNavigate } from 'react-router-dom'
@@ -23,8 +23,18 @@ const BookingList: React.FC = () => {
   const [loadingBooking, errorBooking, responseBooking] = useFetchData('/booking')
   const searchInput = useRef<InputRef>(null)
   const navigate = useNavigate()
-  const changePageDelivery = (id: any) => {
-    navigate(`/bookingdelivery/${id}`)
+  const changePageDelivery = async (id: any) => {
+    try {
+      const response = await getBookingByIdAPI(id)
+      const bookingData = response?.data
+      if (bookingData.bookingDetail.status === 'Fledgling_All' && bookingData.status === 'Preparing') {
+        navigate(`/bookingdelivery/${id}`)
+      } else {
+        notification.error({ message: 'Trứng phải nở và trạng thái của đơn hàng phải là Preparing' })
+      }
+    } catch (err) {
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
   }
   const filterStatus: ColumnFilterItem[] = [
     {
@@ -178,7 +188,7 @@ const BookingList: React.FC = () => {
       width: '15%',
       render: (_, record) => (
         <Space size='middle'>
-          <AddEggButton booking={record} />
+          {record.status === 'Confirmed' ? <AddEggButton booking={record} /> : <></>}
           <BookingDetailModal id={record.id} />
         </Space>
       )

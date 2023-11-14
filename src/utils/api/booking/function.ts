@@ -7,7 +7,7 @@ const APIs_URL = {
   BOOKING_UPDATE_STATUS: (id: number, status: string) => `/booking/${id}/status?status=${status}`,
   BOOKING_USERID: (id: number) => `booking/users/${id}`,
   ADD_BIRDPAIRING: `birdparing?bookingDetailId`,
-  UPDATE_TRACKING_NUMBER: (id: number, tracking: number) => `booking/${id}/tracking-number?tracking-number=${tracking}`,
+  UPDATE_TRACKING_NUMBER: (id: number) => `booking/${id}`,
   UPDATE_STATUS_BIRDPAIRING: (id: number, status: string) => `birdparing/${id}/status?status=${status}`
 }
 
@@ -31,8 +31,8 @@ export const postBirdPairing = async (id: { bookingDetailId: number }) => {
   return await axiosClient.post(APIs_URL.ADD_BIRDPAIRING, id)
 }
 
-export const updateTrackingNumberAPI = async (id: number, tracking: number) => {
-  return await axiosClient.put(APIs_URL.UPDATE_TRACKING_NUMBER(id, tracking))
+export const updateTrackingNumberAPI = async (id: number, tracking: string) => {
+  return await axiosClient.put(APIs_URL.UPDATE_TRACKING_NUMBER(id), tracking)
 }
 
 export const updateStatusPairingAPI = async (id: number, status: string) => {

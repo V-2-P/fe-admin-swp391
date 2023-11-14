@@ -51,13 +51,13 @@ const Delivery: React.FC = () => {
   const [form] = Form.useForm<DeliveryFieldType>()
 
   const fetchUserList = async (username: string): Promise<OptionType[]> => {
-    console.log('fetching user', username)
-    const res = (await axiosClient.get('https://randomuser.me/api/?results=5')) as any
+    const res = (await axiosClient.get(`orders?keyword=${username}`)) as any
 
     return res.results.map((user: { name: { first: string; last: string }; login: { username: string } }) => ({
-      label: `${user.name.first} ${user.name.last}`,
+      label: `${user.name} ${user.name.last}`,
       value: user.login.username
     }))
+    // return res.data.map((e: any) => <div>{e.id}</div>)
   }
   const handleChangeData = (newValue: OptionType[]) => {
     if (!newValue) {
