@@ -8,6 +8,7 @@ import BirdDetail from '../birdList/birdDetail'
 import AddEggButton from './addEggButton'
 import { reFetchData } from '~/redux/slices'
 import { useDispatch } from 'react-redux'
+import { formatCurrencyVND } from '~/utils/numberUtils'
 const { useBreakpoint } = Grid
 
 const { Title } = Typography
@@ -150,12 +151,12 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
     },
     {
       label: 'Tiền đặt cọc',
-      children: data?.paymentDeposit,
+      children: formatCurrencyVND(data?.paymentDeposit),
       span: 3
     },
     {
       label: 'Tổng tiền',
-      children: data?.totalPayment,
+      children: formatCurrencyVND(data?.totalPayment),
       span: 3
     }
   ]
@@ -183,7 +184,15 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
       fixed: 'right',
       render: (_, record) => (
         <Space size='middle'>
-          {record.status === 'Fledgling' ? <BirdDetail id={record.newBird.id} /> : <></>}
+          {record.status === 'Fledgling' ? (
+            data?.status !== 'Shipping' ? (
+              <BirdDetail id={record.newBird.id} />
+            ) : (
+              <></>
+            )
+          ) : (
+            <></>
+          )}
           {record.status === 'Egg' ? (
             <>
               <Button
@@ -243,7 +252,7 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
             <Col span={24}>
               <div className='flex flex-row justify-between items-center'>
                 <Title level={3}>Thông tin chim lai</Title>
-                <AddEggButton booking={data!} />
+                {data?.status === 'Confirmed' ? <AddEggButton booking={data!} /> : <></>}
               </div>
               <Table
                 onRow={(record, rowIndex) => {

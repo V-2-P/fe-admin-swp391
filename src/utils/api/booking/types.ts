@@ -119,4 +119,14 @@ export interface Booking {
   paymentDeposit: number
   totalPayment: number
   bookingDetail: BookingDetail
+  trackingNumber: string
+  shippingMethod: ShippingMethod
+}
+
+interface ShippingMethod {
+  createdAt: string
+  updatedAt: string
+  id: number
+  name: string
+  shippingMoney: number
 }

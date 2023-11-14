@@ -1,4 +1,4 @@
-import { App, Card, Col, Descriptions, List, Row, Space, Typography } from 'antd'
+import { App, Button, Card, Col, Descriptions, Form, Input, List, Row, Space, Typography } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
@@ -12,7 +12,7 @@ const BookingDelivery: React.FC = () => {
   const { notification } = App.useApp()
   const dispatch = useAppDispatch()
   const [data, setData] = useState<Booking>()
-
+  const [form] = Form.useForm()
   const onFinish = async () => {
     try {
       const response = await updateBookingStatusAPI(Number(id), 'Shipping')
@@ -26,7 +26,7 @@ const BookingDelivery: React.FC = () => {
       notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
     }
   }
-  console.log(onFinish)
+
   useEffect(() => {
     const fetchUser = async (id: number) => {
       const res = await getBookingByIdAPI(id)
@@ -50,7 +50,7 @@ const BookingDelivery: React.FC = () => {
         <Row>
           <Col span={24}>
             <Card bordered={false}>
-              {/* <Form
+              <Form
                 form={form}
                 name='delivery'
                 labelCol={{ span: 8 }}
@@ -58,115 +58,34 @@ const BookingDelivery: React.FC = () => {
                 wrapperCol={{ span: 16 }}
                 style={{ width: '100%' }}
                 onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
                 autoComplete='off'
               >
-                <Form.Item<DeliveryFieldType>
-                  label='Mã đơn hàng'
-                  name='inputOrderId'
-                  rules={[{ required: true, message: 'Vui lòng chọn mã đơn hàng!' }]}
-                >
-                  <DebounceSelect
-                    showSearch
-                    placeholder='Chọn mã đơn hàng'
-                    fetchOptions={fetchUserList}
-                    onChange={(newValue) => handleChangeData(newValue as OptionType[])}
-                    size='large'
-                    tokenSeparators={[',']}
-                    style={{ width: '100%' }}
-                  />
-                </Form.Item>
-                <Form.Item wrapperCol={{ span: 24 }}> */}
-              <List itemLayout='horizontal'>
-                <List.Item>
-                  <List.Item.Meta
-                    title={<Typography.Title level={5}>{'Chim bố'}</Typography.Title>}
-                    description={
-                      <Descriptions
-                        items={[
-                          {
-                            key: '1',
-                            label: 'Tên',
-                            children: data?.bookingDetail.fatherBird.name
-                          },
-                          {
-                            key: '2',
-                            label: 'Tuổi',
-                            children: data?.bookingDetail.fatherBird.age
-                          },
-                          {
-                            key: '3',
-                            label: 'Màu',
-                            children: data?.bookingDetail.fatherBird.color
-                          },
-                          {
-                            key: '4',
-                            label: 'Độ thuần chủng',
-                            children: data?.bookingDetail.fatherBird.purebredLevel
-                          }
-                        ]}
-                        column={4}
-                      />
-                    }
-                  />
-                </List.Item>
-                <List.Item>
-                  <List.Item.Meta
-                    title={<Typography.Title level={5}>{'Chim mẹ'}</Typography.Title>}
-                    description={
-                      <Descriptions
-                        items={[
-                          {
-                            key: '1',
-                            label: 'Tên',
-                            children: data?.bookingDetail.motherBird.name
-                          },
-                          {
-                            key: '2',
-                            label: 'Tuổi',
-                            children: data?.bookingDetail.motherBird.age
-                          },
-                          {
-                            key: '3',
-                            label: 'Màu',
-                            children: data?.bookingDetail.motherBird.color
-                          },
-                          {
-                            key: '4',
-                            label: 'Độ thuần chủng',
-                            children: data?.bookingDetail.motherBird.purebredLevel
-                          }
-                        ]}
-                        column={4}
-                      />
-                    }
-                  />
-                </List.Item>
-              </List>
-              <List
-                dataSource={data?.bookingDetail.birdPairing}
-                itemLayout='horizontal'
-                renderItem={(item) => (
+                <List itemLayout='horizontal'>
                   <List.Item>
                     <List.Item.Meta
-                      title={<Typography.Title level={5}>{'Danh sách chim con'}</Typography.Title>}
+                      title={<Typography.Title level={5}>{'Chim bố'}</Typography.Title>}
                       description={
                         <Descriptions
                           items={[
                             {
                               key: '1',
                               label: 'Tên',
-                              children: item.newBird.name
+                              children: data?.bookingDetail.fatherBird.name
                             },
                             {
                               key: '2',
-                              label: 'Màu',
-                              children: item.newBird.color
+                              label: 'Tuổi',
+                              children: data?.bookingDetail.fatherBird.age
                             },
                             {
                               key: '3',
-                              label: 'Giới tính',
-                              children: item.newBird.gender
+                              label: 'Màu',
+                              children: data?.bookingDetail.fatherBird.color
+                            },
+                            {
+                              key: '4',
+                              label: 'Độ thuần chủng',
+                              children: data?.bookingDetail.fatherBird.purebredLevel
                             }
                           ]}
                           column={4}
@@ -174,19 +93,82 @@ const BookingDelivery: React.FC = () => {
                       }
                     />
                   </List.Item>
-                )}
-              />
-              {/* </Form.Item> */}
+                  <List.Item>
+                    <List.Item.Meta
+                      title={<Typography.Title level={5}>{'Chim mẹ'}</Typography.Title>}
+                      description={
+                        <Descriptions
+                          items={[
+                            {
+                              key: '1',
+                              label: 'Tên',
+                              children: data?.bookingDetail.motherBird.name
+                            },
+                            {
+                              key: '2',
+                              label: 'Tuổi',
+                              children: data?.bookingDetail.motherBird.age
+                            },
+                            {
+                              key: '3',
+                              label: 'Màu',
+                              children: data?.bookingDetail.motherBird.color
+                            },
+                            {
+                              key: '4',
+                              label: 'Độ thuần chủng',
+                              children: data?.bookingDetail.motherBird.purebredLevel
+                            }
+                          ]}
+                          column={4}
+                        />
+                      }
+                    />
+                  </List.Item>
+                </List>
+                <List
+                  dataSource={data?.bookingDetail.birdPairing}
+                  itemLayout='horizontal'
+                  renderItem={(item) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        title={<Typography.Title level={5}>{'Danh sách chim con'}</Typography.Title>}
+                        description={
+                          <Descriptions
+                            items={[
+                              {
+                                key: '1',
+                                label: 'Tên',
+                                children: item.newBird.name
+                              },
+                              {
+                                key: '2',
+                                label: 'Màu',
+                                children: item.newBird.color
+                              },
+                              {
+                                key: '3',
+                                label: 'Giới tính',
+                                children: item.newBird.gender
+                              }
+                            ]}
+                            column={4}
+                          />
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
 
-              {/* <Form.Item<DeliveryFieldType> name='deliveryBy' label='Phương thức vận chuyển'>
-                  <Input size='large' disabled placeholder='Vui lòng chọn phương thức vận chuyển' />
+                <Form.Item name='trackingNumber' label='Mã vận chuyển'>
+                  <Input size='large' placeholder='Vui lòng nhập mã vận chuyển' />
                 </Form.Item>
                 <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
-                  <Button loading={isButtonLoading} type='primary' htmlType='submit' className='w-full' size='large'>
+                  <Button type='primary' htmlType='submit' className='w-full' size='large'>
                     Xác nhận
                   </Button>
                 </Form.Item>
-              </Form> */}
+              </Form>
             </Card>
           </Col>
         </Row>
