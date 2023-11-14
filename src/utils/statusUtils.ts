@@ -89,5 +89,6 @@ export const getBookingStatus = (status: BookingStatus | string): { name: string
         color: 'magenta'
       }
   }
+
   return result
 }

@@ -2,9 +2,12 @@ import { Button, Card, Col, Descriptions, Grid, Modal, Row, Skeleton, Space, Typ
 import { ColumnsType } from 'antd/es/table'
 import { DescriptionsProps, Table } from 'antd/lib'
 import React, { useState } from 'react'
-import { BirdPairing, Booking, getBookingByIdAPI } from '~/utils/api/booking'
+import { BirdPairing, Booking, getBookingByIdAPI, updateStatusPairingAPI } from '~/utils/api/booking'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import BirdDetail from '../birdList/birdDetail'
+import AddEggButton from './addEggButton'
+import { reFetchData } from '~/redux/slices'
+import { useDispatch } from 'react-redux'
 const { useBreakpoint } = Grid
 
 const { Title } = Typography
@@ -18,6 +21,7 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [data, setData] = useState<Booking>()
+  const dispatch = useDispatch()
   const handleCancel = () => {
     console.log('Clicked cancel button')
     setOpen(false)
@@ -31,6 +35,23 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
       setLoading(false)
       if (response) {
         setData(response.data)
+      } else {
+        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      }
+    } catch (err) {
+      setLoading(false)
+      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
+    }
+  }
+
+  const changeStatusPairing = async (status: string, id: number) => {
+    setLoading(true)
+    try {
+      setLoading(false)
+      const response = await updateStatusPairingAPI(id, status)
+      if (response) {
+        notification.success({ message: 'Successful' })
+        dispatch(reFetchData())
       } else {
         notification.error({ message: 'Sorry! Something went wrong. App server error' })
       }
@@ -145,13 +166,6 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
       dataIndex: 'id'
     },
     {
-      title: 'Mã chim',
-      width: '10%',
-      render: (_, record) => {
-        return record.newBird.id
-      }
-    },
-    {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
       render: (_, { createdAt }) => {
@@ -166,8 +180,33 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
     },
     {
       title: 'Action',
+      fixed: 'right',
       render: (_, record) => (
-        <Space size='middle'>{record.status === 'Fledgling' ? <BirdDetail id={record.newBird.id} /> : <></>}</Space>
+        <Space size='middle'>
+          {record.status === 'Fledgling' ? <BirdDetail id={record.newBird.id} /> : <></>}
+          {record.status === 'Egg' ? (
+            <>
+              <Button
+                type='link'
+                loading={loading}
+                className='!p-0'
+                onClick={() => changeStatusPairing('Fledgling', record.id)}
+              >
+                Đã nở
+              </Button>
+              <Button
+                type='link'
+                loading={loading}
+                className='!p-0'
+                onClick={() => changeStatusPairing('Failed', record.id)}
+              >
+                Trứng hư
+              </Button>
+            </>
+          ) : (
+            <></>
+          )}
+        </Space>
       )
     }
   ]
@@ -204,6 +243,7 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
             <Col span={24}>
               <div className='flex flex-row justify-between items-center'>
                 <Title level={3}>Thông tin chim lai</Title>
+                <AddEggButton booking={data!} />
               </div>
               <Table
                 onRow={(record, rowIndex) => {

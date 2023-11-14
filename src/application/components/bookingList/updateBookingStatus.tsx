@@ -9,7 +9,7 @@ type UpdateBookingStatusProps = {
   status: BookingStatus | string
   id: number
 }
-const options = [{ value: BookingStatus.confirmed }, { value: BookingStatus.preparing }]
+const options = [{ value: BookingStatus.preparing }]
 const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id }) => {
   const [currentStatus, setCurrentStatus] = useState<BookingStatus | string>(status)
   const [loading, setLoading] = useState<boolean>(false)
@@ -44,10 +44,11 @@ const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id })
   const onClick: MenuProps['onClick'] = ({ key }) => {
     handleChangeStatus(key)
   }
+  console.log(currentStatus)
   return (
     <Spin spinning={loading}>
       <Dropdown menu={{ items, onClick }} trigger={['click']} placement='bottomRight' className='cursor-pointer'>
-        <a onClick={(e) => e.preventDefault()}>
+        <a onClick={(e) => e.currentTarget}>
           <Tag bordered={false} color={getBookingStatus(currentStatus).color}>
             {getBookingStatus(currentStatus).name}
           </Tag>
