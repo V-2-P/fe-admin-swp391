@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Layout, Button, Drawer, Typography, Grid, theme, Badge, Dropdown, Avatar, Space } from 'antd'
-import {
-  MenuOutlined,
-  BellOutlined,
-  MessageOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  QuestionCircleOutlined
-} from '@ant-design/icons'
+import { Layout, Button, Drawer, Typography, Grid, theme, Dropdown, Avatar, Space } from 'antd'
+import { MenuOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import Menu from './menu'
 import { Link } from 'react-router-dom'
@@ -16,48 +9,6 @@ import { logout } from '~/redux/slices'
 
 const { Title } = Typography
 const { useBreakpoint } = Grid
-
-const notifications: MenuProps['items'] = [
-  {
-    label: (
-      <a href='https://www.antgroup.com'>
-        <div className='unread flex flex-wrap flex-row items-center border-b border-gray-100 dark:border-gray-800 [&amp;.unread]:bg-surface-400 dark:[&amp;.unread]:bg-surfacedark-400 hover:bg-surface-200 dark:hover:bg-surfacedark-200 py-2'>
-          <div className='flex-shrink max-w-full px-2 w-1/4 text-center'>
-            <MessageOutlined className='text-[32px]' />
-          </div>
-          <div className='flex-shrink max-w-full px-2 w-3/4'>
-            <div className='text-body-md'>Time for a meeting with Mr.Roger</div>
-            <div className='text-gray-500 text-body-md mt-1'>5 Minutes Ago</div>
-          </div>
-        </div>
-      </a>
-    ),
-    key: '0'
-  },
-  {
-    label: (
-      <a href='https://www.antgroup.com'>
-        <div className='unread flex flex-wrap flex-row items-center border-b border-gray-100 dark:border-gray-800 [&amp;.unread]:bg-surface-400 dark:[&amp;.unread]:bg-surfacedark-400 hover:bg-surface-200 dark:hover:bg-surfacedark-200 py-2'>
-          <div className='flex-shrink max-w-full px-2 w-1/4 text-center'>
-            <MessageOutlined className='text-[32px]' />
-          </div>
-          <div className='flex-shrink max-w-full px-2 w-3/4'>
-            <div className='text-body-md'>Time for a meeting with Mr.Roger</div>
-            <div className='text-gray-500 text-body-md mt-1'>5 Minutes Ago</div>
-          </div>
-        </div>
-      </a>
-    ),
-    key: '1'
-  },
-  {
-    type: 'divider'
-  },
-  {
-    label: <a className='w-full flex justify-center items-center'>Show all Notifications</a>,
-    key: '3'
-  }
-]
 
 const Header: React.FC = () => {
   const screens = useBreakpoint()
@@ -78,17 +29,7 @@ const Header: React.FC = () => {
       ),
       key: '0'
     },
-    {
-      label: (
-        <Link to='/support'>
-          <Space>
-            <QuestionCircleOutlined className='!text-[24px]' />
-            Giúp đỡ
-          </Space>
-        </Link>
-      ),
-      key: '1'
-    },
+
     {
       type: 'divider'
     },
@@ -145,13 +86,6 @@ const Header: React.FC = () => {
         className='lg:!hidden !text-[1rem] !w-16 !h-16'
       />
       <div className='flex flex-row items-center gap-4 ml-auto'>
-        <Dropdown className='w-[50px]' menu={{ items: notifications }} trigger={['click']} placement='bottomRight'>
-          <div className='cursor-pointer flex justify-center items-center'>
-            <Badge count={200} overflowCount={10}>
-              <BellOutlined className='!text-[28px]' />
-            </Badge>
-          </div>
-        </Dropdown>
         <Dropdown menu={{ items: profiles, className: 'min-w-[200px]' }} trigger={['click']} placement='bottomRight'>
           <div className='cursor-pointer'>
             <Avatar size='large' icon={<UserOutlined />} />

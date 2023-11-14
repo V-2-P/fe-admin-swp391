@@ -8,9 +8,9 @@ type PublicRouteProps = {
 }
 
 const PublicRoute: React.FC<PublicRouteProps> = ({ redirectPath = '/dashboard', children }) => {
-  const { isLogin } = useAppSelector((state) => state.account)
+  const { isLogin, role } = useAppSelector((state) => state.account)
   if (isLogin) {
-    return <Navigate to={redirectPath} replace />
+    return <Navigate to={role === 'ROLE_ADMIN' || role === 'ROLE_MANAGER' ? redirectPath : '/profile'} replace />
   }
 
   return children ? children : <Outlet />

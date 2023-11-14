@@ -1,5 +1,5 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { LoginPayload, LoginResponse, Role, loginAPI } from '~/utils/api'
+import { LoginPayload, LoginResponse, loginAPI } from '~/utils/api'
 
 export interface AccountState {
   isLogin: boolean
@@ -8,7 +8,7 @@ export interface AccountState {
   accessToken?: string
   refreshToken?: string
   userId?: number
-  role?: Role
+  role?: string
   imageUrl?: string
 }
 

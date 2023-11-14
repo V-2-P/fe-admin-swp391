@@ -1,9 +1,9 @@
 import React from 'react'
-import { Form, Input, Button, Typography, Divider, Space, Image, App } from 'antd'
-import { UserOutlined, LockOutlined, FacebookFilled, GoogleSquareFilled } from '@ant-design/icons'
+import { Form, Input, Button, Typography, Image, App } from 'antd'
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '~/application/hooks/reduxHook'
-import { loginAsync } from '~/redux/slices/accountSlice'
+import { loginAsync, logout } from '~/redux/slices/accountSlice'
 import { LoginPayload } from '~/utils/api'
 const { Title } = Typography
 
@@ -19,10 +19,19 @@ const LoginPage: React.FC = () => {
         email: values.email,
         password: values.password
       }
-      await dispatch(loginAsync(payload)).unwrap()
-      form.resetFields()
-      notification.success({ message: `Chào mừng bạn đến với BFS` })
-      navigate('/dashboard')
+      const account = await dispatch(loginAsync(payload)).unwrap()
+      if (account.role === 'ROLE_CUSTOMER') {
+        dispatch(logout())
+        notification.error({ message: `Tài khoản không hợp lệ` })
+      } else if (account.role === 'ROLE_STAFF') {
+        navigate('/profile')
+        form.resetFields()
+        notification.success({ message: `Chào mừng bạn đến với BFS` })
+      } else if (account.role === 'ROLE_ADMIN' || account.role === 'ROLE_MANAGER') {
+        navigate('/dashboard')
+        form.resetFields()
+        notification.success({ message: `Chào mừng bạn đến với BFS` })
+      }
     } catch (err) {
       notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
     }
@@ -57,15 +66,7 @@ const LoginPage: React.FC = () => {
           <Link className='float-right mt-2' to='https://ant.design'>
             Forgot password
           </Link>
-          <Divider plain>or</Divider>
-          <Form.Item>
-            <div className='flex items-center justify-center'>
-              <Space align='center' size={24}>
-                <Button shape='circle' size='large' icon={<FacebookFilled className='cursor-pointer' />}></Button>
-                <Button shape='circle' size='large' icon={<GoogleSquareFilled className='cursor-pointer' />}></Button>
-              </Space>
-            </div>
-          </Form.Item>
+          <Form.Item></Form.Item>
           <Form.Item>
             <Button type='primary' loading={isLoading} htmlType='submit' block>
               Log in

@@ -15,6 +15,7 @@ import {
 import { Menu as AntMenu } from 'antd'
 import type { MenuProps } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useAppSelector } from '../hooks/reduxHook'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -33,62 +34,90 @@ function getItem(
     type
   } as MenuItem
 }
-const items: MenuItem[] = [
-  getItem('Tổng quan', '/dashboard', <DashboardOutlined />),
-  getItem('Thông tin cá nhân', '/profile', <UserOutlined />),
-  getItem('Quản lý nông trại', 'sub1', <ShopOutlined />, [
-    getItem('Danh sách chim', '/birdlist', <ProfileOutlined />),
-    getItem('Danh sách loài chim', '/birdtypelist', <ProfileOutlined />),
-    getItem('Danh sách danh mục', '/categorylist', <ProfileOutlined />),
-    getItem('Thêm chim', '/addbird', <PlusOutlined />)
-  ]),
-  getItem('Quản lý website', 'sub2', <ShopOutlined />, [
-    getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />),
-    getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />),
-    getItem('Danh sách vận chuyển', '/shipmentlist', <CommentOutlined />)
-  ]),
-  getItem('Quản lý đơn đặt hàng', 'sub3', <AppstoreOutlined />, [
-    getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
-    getItem('Giao hàng', '/delivery', <CarOutlined />)
-  ]),
-  getItem('Quản lý đơn lai chim', 'sub4', <AppstoreOutlined />, [
-    getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />),
-    getItem('Giao hàng', '/bookingdelivery', <CarOutlined />)
-  ]),
-  getItem('Quản lý khách hàng', 'sub5', <AppstoreOutlined />, [
-    getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)
-  ]),
-  getItem('Quản lý nhân viên', 'sub6', <AppstoreOutlined />, [
-    getItem('Danh sách nhân viên', '/stafflist', <TeamOutlined />),
-    getItem('Thêm nhân viên', '/addstaff', <PlusOutlined />),
-    getItem('Cập nhật nhân viên', '/updatestaff', <EditOutlined />)
-  ])
-]
 
-const findSubmenuByPath = (items: any[], path: string): string => {
-  let submenu: any
+const Menu: React.FC = () => {
+  const { role } = useAppSelector((state) => state.account)
+  const items: MenuItem[] =
+    role === 'ROLE_ADMIN' || role === 'ROLE_MANAGER'
+      ? [
+          getItem('Tổng quan', '/dashboard', <DashboardOutlined />),
+          getItem('Thông tin cá nhân', '/profile', <UserOutlined />),
+          getItem('Quản lý nông trại', 'sub1', <ShopOutlined />, [
+            getItem('Danh sách chim', '/birdlist', <ProfileOutlined />),
+            getItem('Danh sách loài chim', '/birdtypelist', <ProfileOutlined />),
+            getItem('Danh sách danh mục', '/categorylist', <ProfileOutlined />),
+            getItem('Thêm chim', '/addbird', <PlusOutlined />)
+          ]),
+          getItem('Quản lý website', 'sub2', <ShopOutlined />, [
+            getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />),
+            getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />),
+            getItem('Danh sách vận chuyển', '/shipmentlist', <CommentOutlined />)
+          ]),
+          getItem('Quản lý đơn đặt hàng', 'sub3', <AppstoreOutlined />, [
+            getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
+            getItem('Giao hàng', '/delivery', <CarOutlined />)
+          ]),
+          getItem('Quản lý đơn lai chim', 'sub4', <AppstoreOutlined />, [
+            getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />),
+            getItem('Giao hàng', '/bookingdelivery', <CarOutlined />)
+          ]),
+          getItem('Quản lý khách hàng', 'sub5', <AppstoreOutlined />, [
+            getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)
+          ]),
+          getItem('Quản lý nhân viên', 'sub6', <AppstoreOutlined />, [
+            getItem('Danh sách nhân viên', '/stafflist', <TeamOutlined />),
+            getItem('Thêm nhân viên', '/addstaff', <PlusOutlined />),
+            getItem('Cập nhật nhân viên', '/updatestaff', <EditOutlined />)
+          ])
+        ]
+      : [
+          getItem('Thông tin cá nhân', '/profile', <UserOutlined />),
 
-  const find = (items: any[]) => {
-    for (const item of items) {
-      if (item.key === path) {
-        return true
-      }
+          getItem('Quản lý website', 'sub2', <ShopOutlined />, [
+            getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />),
+            role === 'ROLE_ADMIN' || role === 'ROLE_MANAGER'
+              ? getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />)
+              : null,
 
-      if (item.children) {
-        const found = find(item.children)
-        if (found) {
-          submenu = item
+            role === 'ROLE_ADMIN' || role === 'ROLE_MANAGER'
+              ? getItem('Danh sách vận chuyển', '/shipmentlist', <CommentOutlined />)
+              : null
+          ]),
+          getItem('Quản lý đơn đặt hàng', 'sub3', <AppstoreOutlined />, [
+            getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
+            getItem('Giao hàng', '/delivery', <CarOutlined />)
+          ]),
+          getItem('Quản lý đơn lai chim', 'sub4', <AppstoreOutlined />, [
+            getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />),
+            getItem('Giao hàng', '/bookingdelivery', <CarOutlined />)
+          ]),
+          getItem('Quản lý khách hàng', 'sub5', <AppstoreOutlined />, [
+            getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)
+          ])
+        ]
+  const findSubmenuByPath = (items: any[], path: string): string => {
+    let submenu: any
+
+    const find = (items: any[]) => {
+      for (const item of items) {
+        if (item?.key === path) {
           return true
+        }
+
+        if (item?.children) {
+          const found = find(item.children)
+          if (found) {
+            submenu = item
+            return true
+          }
         }
       }
     }
+
+    find(items)
+
+    return submenu ? submenu.key : ''
   }
-
-  find(items)
-
-  return submenu ? submenu.key : ''
-}
-const Menu: React.FC = () => {
   const regex = /\/.+\/.+/g
   const navigate = useNavigate()
   const location = useLocation()

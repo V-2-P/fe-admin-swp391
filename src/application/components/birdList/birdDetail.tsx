@@ -36,7 +36,7 @@ type BirdDetailProps = {
 }
 
 const BirdDetail: React.FC<BirdDetailProps> = ({ id }) => {
-  const { message, notification } = App.useApp()
+  const { notification } = App.useApp()
   const [open, setOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
@@ -135,11 +135,13 @@ const BirdDetail: React.FC<BirdDetailProps> = ({ id }) => {
 
   const handleOk = () => {
     setConfirmLoading(true)
-    setTimeout(() => {
-      setOpen(false)
-      setConfirmLoading(false)
-      message.success('Click on Yes')
-    }, 2000)
+    // setTimeout(() => {
+    //   setOpen(false)
+    //   setConfirmLoading(false)
+    //   message.success('Click on Yes')
+    // }, 2000)
+    setOpen(false)
+    setConfirmLoading(false)
   }
 
   const handleCancel = () => {
@@ -172,7 +174,7 @@ const BirdDetail: React.FC<BirdDetailProps> = ({ id }) => {
       >
         <Skeleton loading={loading} active paragraph={{ rows: 6 }}>
           <Descriptions
-            extra={<BirdEdit bird={bird} setBird={setBird} />}
+            extra={<BirdEdit bird={bird} setBird={setBird} setOpen={setOpen} />}
             bordered
             column={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4 }}
             items={items}

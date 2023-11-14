@@ -14,9 +14,10 @@ import UpdateImageContainer from './updateImageContainer'
 type BirdEditProps = {
   bird?: any
   setBird: (bird?: BirdDetail) => void
+  setOpen: (open: boolean) => void
 }
 
-const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
+const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird, setOpen }) => {
   console.log(bird)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -44,14 +45,17 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
     : []
   const showModal = () => {
     setIsModalOpen(true)
+    setOpen(false)
   }
 
   const handleOk = () => {
     setIsModalOpen(false)
+    setOpen(false)
   }
 
   const handleCancel = () => {
     setIsModalOpen(false)
+    setOpen(false)
   }
   const onFinish = async (values: UpdateBirdPayload) => {
     setLoading(true)
@@ -199,14 +203,14 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird }) => {
                 </Form.Item>
                 <Form.Item wrapperCol={{ sm: { span: 4, offset: 20 } }}>
                   <Button type='primary' loading={loading} htmlType='submit' className='w-full' size='large'>
-                    Submit
+                    Lưu
                   </Button>
                 </Form.Item>
               </>
             )}
           </Skeleton>
         </Form>
-        <UpdateImageContainer id={bird.id} bird_images={bird.bird_images} />
+        <UpdateImageContainer id={bird.id} bird={bird} setBird={setBird} />
       </Modal>
     </>
   )
