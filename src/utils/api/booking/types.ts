@@ -115,7 +115,7 @@ export interface Booking {
   shippingAddress: string
   paymentMethod: string
   manager: User
-  status: string
+  status: BookingStatus
   paymentDeposit: number
   totalPayment: number
   bookingDetail: BookingDetail

@@ -1,4 +1,4 @@
-import { Button, Card, Col, Input, InputRef, Result, Row, Space, Typography } from 'antd'
+import { Button, Card, Col, Input, InputRef, Result, Row, Space, Tag, Typography } from 'antd'
 import Table, { ColumnType, TableProps } from 'antd/es/table'
 import React, { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
@@ -11,7 +11,8 @@ import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import BookingDetailModal from '~/application/components/bookingList/bookingDetail'
 import { Booking, BookingStatus } from '~/utils/api/booking'
 import AddEggButton from '~/application/components/bookingList/addEggButton'
-import UpdateBookingStatus from '~/application/components/bookingList/updateBookingStatus'
+import { getBookingStatus } from '~/utils/statusUtils'
+import { useNavigate } from 'react-router-dom'
 const { Title } = Typography
 
 type DataIndex = keyof Booking
@@ -21,6 +22,10 @@ const BookingList: React.FC = () => {
   const [searchedColumn, setSearchedColumn] = useState('')
   const [loadingBooking, errorBooking, responseBooking] = useFetchData('/booking')
   const searchInput = useRef<InputRef>(null)
+  const navigate = useNavigate()
+  const changePageDelivery = (id: any) => {
+    navigate(`/bookingdelivery/${id}`)
+  }
   const filterStatus: ColumnFilterItem[] = [
     {
       value: BookingStatus.pending,
@@ -147,7 +152,16 @@ const BookingList: React.FC = () => {
       filters: filterStatus,
       onFilter: (value: any, record) => record.status.includes(value as string),
       sorter: (a, b) => a.status.localeCompare(b.status),
-      render: (_, record) => <UpdateBookingStatus status={record.status} id={record.id} />,
+      render: (_, record) => (
+        // <UpdateBookingStatus status={record.status} id={record.id} />
+        <Tag
+          onClick={() => changePageDelivery(record.id)}
+          bordered={false}
+          color={getBookingStatus(record.status).color}
+        >
+          {getBookingStatus(record.status).name}
+        </Tag>
+      ),
       width: '10%'
     },
     {
