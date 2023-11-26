@@ -6,7 +6,7 @@ import { DeliveryFieldType } from '~/application/components/delivery/type'
 import type { ColumnsType } from 'antd/es/table'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Order, OrderDetail, getOrderByIdAPI, updateOrderShippingStatusAPI } from '~/utils/api'
+import { Order, OrderDetail, getOrderByIdAPI } from '~/utils/api'
 import { reFetchData } from '~/redux/slices'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 
@@ -71,10 +71,8 @@ const Delivery: React.FC = () => {
   const onFinish = async (values: DeliveryFieldType) => {
     setIsButtonLoading(true)
     try {
-      const payload = {
-        trackingNumber: values.trackingId
-      }
-      const response = await updateOrderShippingStatusAPI(Number(id), payload)
+      console.log(values)
+      const response = false
       setIsButtonLoading(false)
       if (response) {
         notification.success({ message: `Cập nhật thành công` })
