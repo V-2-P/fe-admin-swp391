@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axiosClient from '~/utils/api/AxiosClient'
+import axiosClient from '~/utils/api/axiosClient'
 import { useAppSelector } from './reduxHook'
 
 const useFetchData = (url: string, fetchAgain?: boolean) => {

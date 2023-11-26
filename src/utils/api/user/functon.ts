@@ -1,5 +1,5 @@
 import { convertToFormData } from '~/utils/formDataUtils'
-import axiosClient from '../AxiosClient'
+import axiosClient from '../axiosClient'
 import { AddUserPayload, UpdateProfilePayload, UpdateUserPayload } from './types'
 
 const APIs_URL = {

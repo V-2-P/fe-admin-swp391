@@ -50,12 +50,11 @@ const Menu: React.FC = () => {
           ]),
           getItem('Quản lý website', 'sub2', <ShopOutlined />, [
             getItem('Xem đánh giá', '/feedbacklist', <CommentOutlined />),
-            getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />),
-            getItem('Danh sách vận chuyển', '/shipmentlist', <CommentOutlined />)
+            getItem('Danh sách voucher', '/voucherlist', <CommentOutlined />)
           ]),
           getItem('Quản lý đơn đặt hàng', 'sub3', <AppstoreOutlined />, [
-            getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
-            getItem('Giao hàng', '/delivery', <CarOutlined />)
+            getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />)
+            // getItem('Giao hàng', '/delivery', <CarOutlined />)
           ]),
           getItem('Quản lý đơn lai chim', 'sub4', <AppstoreOutlined />, [
             getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />),
@@ -84,12 +83,12 @@ const Menu: React.FC = () => {
               : null
           ]),
           getItem('Quản lý đơn đặt hàng', 'sub3', <AppstoreOutlined />, [
-            getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />),
-            getItem('Giao hàng', '/delivery', <CarOutlined />)
+            getItem('Danh sách đơn đặt hàng', '/orderlist', <ContainerOutlined />)
+            // getItem('Giao hàng', '/delivery', <CarOutlined />)
           ]),
           getItem('Quản lý đơn lai chim', 'sub4', <AppstoreOutlined />, [
-            getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />),
-            getItem('Giao hàng', '/bookingdelivery', <CarOutlined />)
+            getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />)
+            // getItem('Giao hàng', '/bookingdelivery', <CarOutlined />)
           ]),
           getItem('Quản lý khách hàng', 'sub5', <AppstoreOutlined />, [
             getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)

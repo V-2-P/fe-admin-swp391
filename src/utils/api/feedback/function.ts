@@ -1,4 +1,4 @@
-import axiosClient from '../AxiosClient'
+import axiosClient from '../axiosClient'
 
 const APIs_URL = {
   FEEDBACK_DETAIL: (id: any) => `/feedbackbirds/${id}`,

@@ -1,4 +1,4 @@
-import axiosClient from '../AxiosClient'
+import axiosClient from '../axiosClient'
 const APIs_URL = {
   SHIPMENT: '/shippingmethod',
   SHIPMENT_ID: (id: number) => `/shippingmethod/${id}`

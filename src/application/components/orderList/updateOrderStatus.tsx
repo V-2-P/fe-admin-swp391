@@ -1,83 +1,133 @@
 import React, { useState } from 'react'
-import { OrderStatus, updateOrderProcessingStatusAPI } from '~/utils/api'
+import {
+  OrderStatus,
+  updateOrderDeliveredStatusAPI,
+  updateOrderProcessingStatusAPI,
+  updateOrderShippingStatusAPI
+} from '~/utils/api'
 import { getOrderStatus } from '~/utils/statusUtils'
 import { Dropdown, Tag, App, Spin } from 'antd'
 import { reFetchData } from '~/redux/slices'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
-import { Link } from 'react-router-dom'
+
 type UpdateOrderStatusProps = {
   status: OrderStatus | string
   id: number
 }
-const options = [
-  // { value: OrderStatus.pending },
-  { value: OrderStatus.processing }
-  // { value: OrderStatus.shipping },
-  // { value: OrderStatus.delivered },
-  // { value: OrderStatus.cancelled }
-]
 
 const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => {
   const [currentStatus, setCurrentStatus] = useState<OrderStatus | string>(status)
   const [loading, setLoading] = useState<boolean>(false)
   const { notification } = App.useApp()
   const dispatch = useAppDispatch()
-
-  const items = options.map((option) => ({
-    label: (
-      <Tag bordered={false} color={getOrderStatus(option.value).color}>
-        {getOrderStatus(option.value).name}
-      </Tag>
-    ),
-    key: option.value
-  }))
+  const options = [
+    { value: OrderStatus.pending },
+    { value: OrderStatus.processing },
+    { value: OrderStatus.shipping },
+    { value: OrderStatus.delivered },
+    { value: OrderStatus.cancelled }
+  ]
+  const items = options
+    .filter((options) => {
+      if (options.value === status) {
+        return false
+      }
+      if (
+        status === OrderStatus.pending &&
+        (options.value === OrderStatus.shipping || options.value === OrderStatus.delivered)
+      ) {
+        return false
+      }
+      if (
+        status === OrderStatus.processing &&
+        (options.value === OrderStatus.pending || options.value === OrderStatus.delivered)
+      ) {
+        return false
+      }
+      if (
+        status === OrderStatus.shipping &&
+        (options.value === OrderStatus.pending ||
+          options.value === OrderStatus.processing ||
+          options.value === OrderStatus.cancelled)
+      ) {
+        return false
+      }
+      return true
+    })
+    .map((option) => ({
+      label: (
+        <Tag bordered={false} color={getOrderStatus(option.value).color} className='!w-full !text-center'>
+          {getOrderStatus(option.value).name}
+        </Tag>
+      ),
+      key: option.value
+    }))
   const handleChangeStatus = async (e: any) => {
     setLoading(true)
 
     try {
-      const response = await updateOrderProcessingStatusAPI(id)
-      setLoading(false)
-      if (response) {
-        notification.success({ message: `Cập nhật trạng thái thành công` })
-        setCurrentStatus(e.key)
-        dispatch(reFetchData())
-      } else {
-        notification.error({ message: 'Sorry! Something went wrong. App server error' })
+      if (e.key === OrderStatus.processing) {
+        const response = await updateOrderProcessingStatusAPI(id)
+        setLoading(false)
+        if (response) {
+          notification.success({ message: `Cập nhật trạng thái thành công` })
+          setCurrentStatus(e.key)
+          dispatch(reFetchData())
+        } else {
+          notification.error({ message: 'Sorry! Something went wrong. App server error' })
+        }
+      }
+      if (e.key === OrderStatus.shipping) {
+        const payload: { id: number; strategyType: 'ORDER' | 'BOOKING' } = {
+          id: id,
+          strategyType: 'ORDER'
+        }
+        const response = await updateOrderShippingStatusAPI(payload)
+        setLoading(false)
+        if (response) {
+          notification.success({ message: `Cập nhật trạng thái thành công` })
+          setCurrentStatus(e.key)
+          dispatch(reFetchData())
+        } else {
+          notification.error({ message: 'Sorry! Something went wrong. App server error' })
+        }
+      }
+      if (e.key === OrderStatus.delivered) {
+        const response = await updateOrderDeliveredStatusAPI(id)
+        setLoading(false)
+        if (response) {
+          notification.success({ message: `Cập nhật trạng thái thành công` })
+          setCurrentStatus(e.key)
+          dispatch(reFetchData())
+        } else {
+          notification.error({ message: 'Sorry! Something went wrong. App server error' })
+        }
       }
     } catch (err) {
       setLoading(false)
       notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
     }
   }
-  if (currentStatus === OrderStatus.pending) {
+  if (status === OrderStatus.delivered || status === OrderStatus.cancelled) {
     return (
-      <Spin spinning={loading}>
-        <Dropdown
-          menu={{ items, onClick: handleChangeStatus }}
-          trigger={['click']}
-          placement='bottomRight'
-          className='cursor-pointer'
-        >
-          <Tag bordered={false} color={getOrderStatus(currentStatus).color}>
-            {getOrderStatus(currentStatus).name}
-          </Tag>
-        </Dropdown>
-      </Spin>
-    )
-  }
-  if (currentStatus === OrderStatus.processing || currentStatus === OrderStatus.shipping) {
-    return (
-      <Link to={`/delivery/${id}`}>
-        <Tag bordered={false} color={getOrderStatus(currentStatus).color}>
-          {getOrderStatus(currentStatus).name}
-        </Tag>
-      </Link>
+      <Tag bordered={false} color={getOrderStatus(currentStatus).color} className='!w-full !text-center'>
+        {getOrderStatus(currentStatus).name}
+      </Tag>
     )
   }
   return (
-    <Tag bordered={false} color={getOrderStatus(currentStatus).color}>
-      {getOrderStatus(currentStatus).name}
-    </Tag>
+    <Spin spinning={loading}>
+      <Dropdown
+        menu={{ items, onClick: handleChangeStatus }}
+        trigger={['click']}
+        placement='bottomRight'
+        className='cursor-pointer'
+      >
+        <Tag bordered={false} color={getOrderStatus(currentStatus).color} className='!w-full !text-center'>
+          {getOrderStatus(currentStatus).name}
+        </Tag>
+      </Dropdown>
+    </Spin>
   )
 }
 

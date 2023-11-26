@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Space, Typography, Row, Col, Card, App, Form, Button, Input, Table } from 'antd'
-import axiosClient from '~/utils/api/AxiosClient'
+import axiosClient from '~/utils/api/axiosClient'
 import DebounceSelect, { OptionType } from '~/application/components/shared/DebounceSelect'
 import { DeliveryFieldType } from '~/application/components/delivery/type'
 import type { ColumnsType } from 'antd/es/table'
@@ -52,18 +52,20 @@ const Delivery: React.FC = () => {
 
   const fetchUserList = async (username: string): Promise<OptionType[]> => {
     const res = (await axiosClient.get(`orders?keyword=${username}`)) as any
-
-    return res.results.map((user: { name: { first: string; last: string }; login: { username: string } }) => ({
-      label: `${user.name} ${user.name.last}`,
-      value: user.login.username
-    }))
+    console.log(res)
+    return res.data.orderResponses
+      .filter((order: any) => order.status === 'processing')
+      .map((order: any) => ({
+        label: `Mã đơn hàng ${order.id}-${order.fullName}-trạng thái ${order.status}`,
+        value: order.id
+      }))
     // return res.data.map((e: any) => <div>{e.id}</div>)
   }
-  const handleChangeData = (newValue: OptionType[]) => {
+  const handleChangeData = (newValue: OptionType) => {
     if (!newValue) {
       navigate('/delivery')
     } else {
-      navigate('/delivery/' + Math.random())
+      navigate('/delivery/' + newValue.value)
     }
   }
   const onFinish = async (values: DeliveryFieldType) => {
@@ -147,7 +149,7 @@ const Delivery: React.FC = () => {
                     showSearch
                     placeholder='Chọn mã đơn hàng'
                     fetchOptions={fetchUserList}
-                    onChange={(newValue) => handleChangeData(newValue as OptionType[])}
+                    onChange={(newValue) => handleChangeData(newValue as OptionType)}
                     size='large'
                     tokenSeparators={[',']}
                     style={{ width: '100%' }}

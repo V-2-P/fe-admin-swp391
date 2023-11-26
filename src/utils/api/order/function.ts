@@ -1,11 +1,12 @@
-import axiosClient from '../AxiosClient'
+import axiosClient from '../axiosClient'
 
 const APIs_URL = {
   ORDER: '/orders',
   ORDER_STATUS: (status: string) => `/orders?status=${status}`,
   ORDER_ID: (id: number) => `/orders/${id}`,
   ORDER_PROCESS: (id: number) => `/orders/confirm/${id}`,
-  ORDER_SHIPPING: (id: number) => `/orders/shipping/${id}`,
+  ORDER_DELIVERED: (id: number) => `/orders/delivered/${id}`,
+  ORDER_SHIPPING: `/shipments/create-order`,
   ORDER_USERID: (id: number) => `/orders/user/${id}`
 }
 
@@ -21,8 +22,12 @@ export const updateOrderProcessingStatusAPI = async (id: number) => {
   return await axiosClient.put(APIs_URL.ORDER_PROCESS(id))
 }
 
-export const updateOrderShippingStatusAPI = async (id: number, data: { trackingNumber?: string }) => {
-  return await axiosClient.put(APIs_URL.ORDER_SHIPPING(id), data)
+export const updateOrderShippingStatusAPI = async (data: { id: number; strategyType: 'ORDER' | 'BOOKING' }) => {
+  return await axiosClient.post(APIs_URL.ORDER_SHIPPING, data)
+}
+
+export const updateOrderDeliveredStatusAPI = async (id: number) => {
+  return await axiosClient.put(APIs_URL.ORDER_DELIVERED(id))
 }
 
 export const getOrderByUserId = async (id: number) => {

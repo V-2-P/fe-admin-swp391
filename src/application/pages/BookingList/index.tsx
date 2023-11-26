@@ -1,4 +1,4 @@
-import { Button, Card, Col, Input, InputRef, Result, Row, Space, Tag, Typography, notification } from 'antd'
+import { Button, Card, Col, Input, InputRef, Result, Row, Space, Tag, Typography } from 'antd'
 import Table, { ColumnType, TableProps } from 'antd/es/table'
 import React, { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
@@ -9,10 +9,9 @@ import { ColumnsType } from 'antd/lib/table'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import BookingDetailModal from '~/application/components/bookingList/bookingDetail'
-import { Booking, BookingStatus, getBookingByIdAPI } from '~/utils/api/booking'
-import AddEggButton from '~/application/components/bookingList/addEggButton'
+import { Booking, BookingStatus } from '~/utils/api/booking'
 import { getBookingStatus } from '~/utils/statusUtils'
-import { useNavigate } from 'react-router-dom'
+import UpdateBookingStatus from '~/application/components/bookingList/updateBookingStatus'
 const { Title } = Typography
 
 type DataIndex = keyof Booking
@@ -22,20 +21,7 @@ const BookingList: React.FC = () => {
   const [searchedColumn, setSearchedColumn] = useState('')
   const [loadingBooking, errorBooking, responseBooking] = useFetchData('/booking')
   const searchInput = useRef<InputRef>(null)
-  const navigate = useNavigate()
-  const changePageDelivery = async (id: any) => {
-    try {
-      const response = await getBookingByIdAPI(id)
-      const bookingData = response?.data
-      if (bookingData.bookingDetail.status === 'Fledgling_All' && bookingData.status === 'Preparing') {
-        navigate(`/bookingdelivery/${id}`)
-      } else {
-        notification.error({ message: 'Trứng phải nở và trạng thái của đơn hàng phải là Preparing' })
-      }
-    } catch (err) {
-      notification.error({ message: (err as string) || 'Sorry! Something went wrong. App server error' })
-    }
-  }
+
   const filterStatus: ColumnFilterItem[] = [
     {
       value: BookingStatus.pending,
@@ -138,7 +124,7 @@ const BookingList: React.FC = () => {
       dataIndex: 'id',
       ...getColumnSearchProps('id'),
       sorter: (a, b) => a.id - b.id,
-      width: '10%'
+      align: 'right'
     },
     {
       title: 'Ngày đặt',
@@ -147,14 +133,15 @@ const BookingList: React.FC = () => {
       render: (_, { createdAt }) => {
         return formatDateToDDMMYYYY(new Date(createdAt))
       },
-      width: '17%'
+      align: 'right',
+      defaultSortOrder: 'descend'
     },
     {
       title: 'Người đặt',
       dataIndex: 'fullName',
       ...getColumnSearchProps('fullName'),
       sorter: (a, b) => a.fullName.localeCompare(b.fullName),
-      width: '17%'
+      align: 'right'
     },
     {
       title: 'Trạng thái',
@@ -162,36 +149,32 @@ const BookingList: React.FC = () => {
       filters: filterStatus,
       onFilter: (value: any, record) => record.status.includes(value as string),
       sorter: (a, b) => a.status.localeCompare(b.status),
-      render: (_, record) => (
-        // <UpdateBookingStatus status={record.status} id={record.id} />
-        <Tag
-          onClick={() => changePageDelivery(record.id)}
-          bordered={false}
-          color={getBookingStatus(record.status).color}
-        >
-          {getBookingStatus(record.status).name}
-        </Tag>
-      ),
-      width: '10%'
+      render: (_, record) =>
+        record.status === BookingStatus.pending ? (
+          <Tag bordered={false} color={getBookingStatus(record.status).color} className='!w-full !text-center'>
+            Chờ thanh toán
+          </Tag>
+        ) : (
+          <UpdateBookingStatus status={record.status} id={record.id} bookingDetail={record.bookingDetail} />
+        ),
+      align: 'center'
     },
     {
       title: 'Tổng tiền',
       dataIndex: 'totalPayment',
       sorter: (a, b) => a.id - b.id,
       render: (_, record) => formatCurrencyVND(record.totalPayment),
-      align: 'left',
-      width: '17%'
+      align: 'right'
     },
     {
       key: 'action',
-      fixed: 'right',
       width: '15%',
       render: (_, record) => (
         <Space size='middle'>
-          {record.status === 'Confirmed' ? <AddEggButton booking={record} /> : <></>}
           <BookingDetailModal id={record.id} />
         </Space>
-      )
+      ),
+      align: 'left'
     }
   ]
   const onChange: TableProps<Booking>['onChange'] = (pagination, filters, sorter, extra) => {
@@ -225,21 +208,14 @@ const BookingList: React.FC = () => {
                 <Result title='Failed to fetch' subTitle={errorBooking} status='error' />
               ) : (
                 <Table
+                  rowKey={'id'}
                   loading={loadingBooking}
                   style={{ minHeight: 300 }}
                   columns={columns}
                   pagination={{ pageSize: 10 }}
-                  scroll={{ x: 1300, y: 300 }}
+                  scroll={{ x: 800, y: 300 }}
                   dataSource={responseBooking ? responseBooking.data : []}
                   onChange={onChange}
-                  onRow={(record, rowIndex) => {
-                    return {
-                      onClick: () => {
-                        console.log(rowIndex)
-                        console.log(record)
-                      }
-                    }
-                  }}
                 />
               )}
             </Card>

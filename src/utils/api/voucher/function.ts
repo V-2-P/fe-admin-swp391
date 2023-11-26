@@ -1,5 +1,5 @@
 import { VoucherPayload } from '.'
-import axiosClient from '../AxiosClient'
+import axiosClient from '../axiosClient'
 
 const APIs_URL = {
   VOUCHER: '/voucher',

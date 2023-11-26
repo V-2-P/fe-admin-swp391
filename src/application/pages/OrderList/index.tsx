@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Space, Typography, Button, Row, Col, Card, Table, Input, Result } from 'antd'
+import { Space, Typography, Button, Row, Col, Card, Table, Input, Result, Tag } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import type { ColumnType, ColumnsType, TableProps } from 'antd/es/table'
 import type { ColumnFilterItem, FilterConfirmProps } from 'antd/es/table/interface'
@@ -9,9 +9,9 @@ import { formatDateToDDMMYYYY } from '~/utils/dateUtils'
 import OrderDetailButton from '~/application/components/orderList/orderDetail'
 import { formatCurrencyVND } from '~/utils/numberUtils'
 import useFetchData from '~/application/hooks/useFetchData'
-import { useSearchParams } from 'react-router-dom'
 import { OrderStatus } from '~/utils/api'
 import UpdateOrderStatus from '~/application/components/orderList/updateOrderStatus'
+import { getOrderStatus } from '~/utils/statusUtils'
 
 const { Title } = Typography
 
@@ -43,26 +43,11 @@ type OrderDetail = {
   numberOfProducts: number
 }
 
-type OrderResponse = [
-  loading: boolean,
-  error: any,
-  response: {
-    data: {
-      orderResponses: Order[]
-      totalPages: number
-    }
-  }
-]
-
 type OrderIndex = keyof Order
 
 const OrderList: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
-  const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 10
-  const [loading, error, response] = useFetchData(`/orders?page=${page - 1}&limit=${limit}`) as OrderResponse
-  const totalPages = response ? response.data.totalPages : 0
-  const data: Order[] = response ? response.data.orderResponses : []
+  const [loading, error, response] = useFetchData(`/orders/all`)
+  const data: Order[] = response ? response.data : []
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
@@ -177,13 +162,15 @@ const OrderList: React.FC = () => {
     {
       title: 'Mã đơn hàng',
       dataIndex: 'id',
-      sorter: (a, b) => a.id - b.id
+      sorter: (a, b) => a.id - b.id,
+      align: 'right'
     },
     {
       title: 'Khách hàng',
       dataIndex: 'fullName',
       ...getColumnSearchProps('fullName'),
-      sorter: (a, b) => a.fullName.localeCompare(b.fullName)
+      sorter: (a, b) => a.fullName.localeCompare(b.fullName),
+      align: 'right'
     },
     {
       title: 'Ngày đặt',
@@ -191,7 +178,8 @@ const OrderList: React.FC = () => {
       sorter: (a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
       render: (_, { orderDate }) => {
         return formatDateToDDMMYYYY(new Date(orderDate))
-      }
+      },
+      align: 'right'
     },
     {
       title: 'Trạng thái',
@@ -199,12 +187,15 @@ const OrderList: React.FC = () => {
       filters: filterStatus,
       onFilter: (value: any, record) => record.status.includes(value as string),
       sorter: (a, b) => a.status.localeCompare(b.status),
-      render: (_, record) => (
-        // <Tag bordered={false} color={getOrderStatus(record.status).color}>
-        //   {getOrderStatus(record.status).name}
-        // </Tag>
-        <UpdateOrderStatus status={record.status} id={record.id} />
-      )
+      render: (_, record) =>
+        record.paymentMethod === 'vnpay' && record.status === OrderStatus.pending ? (
+          <Tag bordered={false} color={getOrderStatus(record.status).color} className='!w-full !text-center'>
+            Chờ thanh toán
+          </Tag>
+        ) : (
+          <UpdateOrderStatus status={record.status} id={record.id} />
+        ),
+      align: 'center'
     },
     {
       title: 'Tổng tiền',
@@ -216,14 +207,14 @@ const OrderList: React.FC = () => {
     {
       key: 'action',
       render: (_, record) => <OrderDetailButton id={record.id} />,
-      width: '20%'
+      width: '20%',
+      align: 'left'
     }
   ]
   const onChange: TableProps<Order>['onChange'] = (pagination, filters, sorter, extra) => {
     console.log('params', pagination, filters, sorter, extra)
-    const currentPage = pagination.current!
-    setSearchParams(`page=${currentPage}&limit=${limit}`)
   }
+
   return (
     <div className='flex-grow min-h-[100%] relative px-4 lg:pr-8 lg:pl-3'>
       <Space size='large' direction='vertical' className='w-full'>
@@ -241,7 +232,7 @@ const OrderList: React.FC = () => {
                   loading={loading}
                   style={{ minHeight: 300 }}
                   columns={columns}
-                  pagination={{ pageSize: limit, total: totalPages * limit, current: page }}
+                  pagination={{ pageSize: 10 }}
                   scroll={{ x: 800, y: 300 }}
                   dataSource={data}
                   onChange={onChange}

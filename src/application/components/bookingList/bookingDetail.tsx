@@ -252,7 +252,7 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
             <Col span={24}>
               <div className='flex flex-row justify-between items-center'>
                 <Title level={3}>Thông tin chim lai</Title>
-                {data?.status === 'Confirmed' ? <AddEggButton booking={data!} /> : <></>}
+                {data?.status === 'Confirmed' ? <AddEggButton booking={data!} setBooking={setData} /> : <></>}
               </div>
               <Table
                 onRow={(record, rowIndex) => {

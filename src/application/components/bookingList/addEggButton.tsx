@@ -1,16 +1,14 @@
 import { Button, notification } from 'antd'
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { reFetchData } from '~/redux/slices'
 import { Booking, postBirdPairing } from '~/utils/api/booking'
 
 type AddEggButtonType = {
   booking: Booking
+  setBooking: (data: Booking) => void
 }
 
-const AddEggButton: React.FC<AddEggButtonType> = ({ booking }) => {
+const AddEggButton: React.FC<AddEggButtonType> = ({ booking, setBooking }) => {
   const [loading, setLoading] = useState<boolean>(false)
-  const dispatch = useDispatch()
   const addEgg = async (values: Booking) => {
     setLoading(true)
     const payload = {
@@ -21,7 +19,9 @@ const AddEggButton: React.FC<AddEggButtonType> = ({ booking }) => {
       setLoading(false)
       if (response) {
         notification.success({ message: 'Thêm trứng thành công' })
-        dispatch(reFetchData())
+
+        booking.bookingDetail.birdPairing.push(response.data)
+        setBooking(booking)
       } else {
         notification.success({ message: 'Thêm trứng thất bại' })
       }

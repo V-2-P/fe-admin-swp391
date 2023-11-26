@@ -1,4 +1,4 @@
-import axiosClient from '../AxiosClient'
+import axiosClient from '../axiosClient'
 import { AddBirdTypePayload } from './types'
 
 const APIs_URL = {
