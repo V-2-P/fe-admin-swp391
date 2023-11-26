@@ -112,7 +112,7 @@ export interface Booking {
   fullName: string
   bookingTime: string
   phoneNumber: string
-  shippingAddress: string
+  toAddress: string
   paymentMethod: string
   manager: User
   status: BookingStatus

@@ -62,7 +62,7 @@ export const getBookingStatus = (status: BookingStatus | string): { name: string
     case BookingStatus.confirmed || BookingStatus.confirmed.toString():
       result = {
         // name: status.toString().toUpperCase(),
-        name: 'Lai chim',
+        name: 'Đã đặt cọc',
         color: 'processing'
       }
       break
@@ -94,6 +94,61 @@ export const getBookingStatus = (status: BookingStatus | string): { name: string
         color: 'purple'
       }
       break
+    default:
+      result = {
+        name: 'UNKNOWN',
+        color: 'magenta'
+      }
+  }
+
+  return result
+}
+export const getBookingDetailStatus = (status: string): { name: string; color: string } => {
+  let result
+  switch (status) {
+    case 'Waiting':
+      result = {
+        // name: status.toString().toUpperCase(),
+        name: 'Đã đặt cọc',
+        color: 'processing'
+      }
+      break
+    case 'In_Breeding_Progress':
+      result = {
+        // name: status.toString().toUpperCase(),
+        name: 'Nhân giống',
+        color: 'processing'
+      }
+      break
+    case 'Brooding':
+      result = {
+        // name: status.toString().toUpperCase(),
+        name: 'Ấp trứng',
+        color: 'success'
+      }
+      break
+    case 'Fledgling_All':
+      result = {
+        // name: status.toString().toUpperCase(),
+        name: 'Trứng nở hết',
+        color: 'orange'
+      }
+      break
+    case 'Cancelled':
+      result = {
+        // name: status.toString().toUpperCase(),
+        name: 'Hủy',
+        color: 'red'
+      }
+      break
+    case 'Preparing':
+      result = {
+        // name: status.toString().toUpperCase(),
+        name: 'Nhận con',
+        color: 'cyan'
+      }
+      break
+
     default:
       result = {
         name: 'UNKNOWN',

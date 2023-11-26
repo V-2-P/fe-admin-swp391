@@ -24,7 +24,7 @@ const BirdEdit: React.FC<BirdEditProps> = ({ bird, setBird, setOpen }) => {
   const dispatch = useAppDispatch()
   const [form] = Form.useForm()
   const { notification, message } = App.useApp()
-  const genders = [{ value: 'male', label: 'Đực' }, { value: 'female', label: 'Cái' }, { value: 'Khác' }]
+  const genders = [{ value: 'Trống', label: 'Trống' }, { value: 'Mái', label: 'Mái' }, { value: 'Khác' }]
   const statuss = [
     { value: true, label: 'Còn bán' },
     { value: false, label: 'Ngừng bán' }

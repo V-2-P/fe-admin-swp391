@@ -24,29 +24,12 @@ const UpdateImageContainer: React.FC<BirdEditProps> = ({ id, bird }) => {
   )
   const [form] = Form.useForm()
   const normFile1 = (e: any) => {
-    console.log('Upload event:', e)
+    // console.log('Upload event:', e)
     if (Array.isArray(e)) {
       return e
     }
     return e?.fileList
   }
-  //   const normFile2 = (e: any) => {
-  //     console.log('Upload event:', e)
-
-  //     return e?.file
-  //   }
-  const onChangeImages: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-    console.log('change')
-    console.log(newFileList)
-
-    setFileImages(newFileList)
-  }
-  //   const onChangeThumbnail: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
-  //     console.log(info)
-  //     getBase64(info.file.originFileObj as RcFile, (url) => {
-  //       setImageUrl(url)
-  //     })
-  //   }
 
   const onPreview = async (file: UploadFile) => {
     let src = file.url as string
@@ -67,6 +50,19 @@ const UpdateImageContainer: React.FC<BirdEditProps> = ({ id, bird }) => {
       const response = await deleteBirdImageAPI(file.uid)
       if (response) {
         console.log('sucesss')
+        // Tạo một bản sao của mảng birdPairings
+        const oldFileImages = [...fileImages]
+
+        // Tìm chỉ mục của phần tử có id tương ứng trong mảng
+        const indexToRemove = oldFileImages.findIndex((f) => f.uid === file.uid)
+
+        // Nếu tìm thấy phần tử, loại bỏ nó khỏi mảng
+        if (indexToRemove !== -1) {
+          oldFileImages.splice(indexToRemove, 1)
+
+          // Cập nhật state với mảng đã cập nhật
+          setFileImages(oldFileImages)
+        }
       } else {
         console.log('1')
       }
@@ -86,10 +82,18 @@ const UpdateImageContainer: React.FC<BirdEditProps> = ({ id, bird }) => {
         }
         console.log(data)
         const res = await addBirdImageAPI(id, data)
-
-        options.onSuccess(options.file)
-        console.log(options)
         console.log(res)
+        setFileImages([
+          ...fileImages,
+          {
+            uid: res.data[0].id.toString(),
+            name: res.data[0].imageUrl,
+            status: 'done',
+            url: getBirdImage(res.data[0].imageUrl)
+          }
+        ])
+
+        options.onSuccess('Ok')
       } catch (err) {
         options.onError({ event: 'Đã có lỗi' })
       }
@@ -107,11 +111,10 @@ const UpdateImageContainer: React.FC<BirdEditProps> = ({ id, bird }) => {
       return isJpgOrPng && isLt2M
     },
     fileList: fileImages,
-    onChange: onChangeImages,
     onPreview: onPreview,
     onRemove: onRemove
   }
-
+  console.log()
   return (
     <>
       <Form form={form}>

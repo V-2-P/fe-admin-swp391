@@ -1,10 +1,10 @@
 import { Button, notification } from 'antd'
 import React, { useState } from 'react'
-import { Booking, postBirdPairing } from '~/utils/api/booking'
+import { BirdPairing, Booking, postBirdPairing } from '~/utils/api/booking'
 
 type AddEggButtonType = {
   booking: Booking
-  setBooking: (data: Booking) => void
+  setBooking: (data: BirdPairing) => void
 }
 
 const AddEggButton: React.FC<AddEggButtonType> = ({ booking, setBooking }) => {
@@ -19,9 +19,7 @@ const AddEggButton: React.FC<AddEggButtonType> = ({ booking, setBooking }) => {
       setLoading(false)
       if (response) {
         notification.success({ message: 'Thêm trứng thành công' })
-
-        booking.bookingDetail.birdPairing.push(response.data)
-        setBooking(booking)
+        setBooking(response.data)
       } else {
         notification.success({ message: 'Thêm trứng thất bại' })
       }

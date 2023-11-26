@@ -36,6 +36,7 @@ type BirdDetailProps = {
 }
 
 const BirdDetail: React.FC<BirdDetailProps> = ({ id }) => {
+  console.log(id)
   const { notification } = App.useApp()
   const [open, setOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)

@@ -12,6 +12,7 @@ import BookingDetailModal from '~/application/components/bookingList/bookingDeta
 import { Booking, BookingStatus } from '~/utils/api/booking'
 import { getBookingStatus } from '~/utils/statusUtils'
 import UpdateBookingStatus from '~/application/components/bookingList/updateBookingStatus'
+import ConfirmButton from '~/application/components/bookingList/confirmButton'
 const { Title } = Typography
 
 type DataIndex = keyof Booking
@@ -171,7 +172,11 @@ const BookingList: React.FC = () => {
       width: '15%',
       render: (_, record) => (
         <Space size='middle'>
-          <BookingDetailModal id={record.id} />
+          {record.status === BookingStatus.confirmed && record.bookingDetail.status === 'Waiting' ? (
+            <ConfirmButton id={record.bookingDetail.id} />
+          ) : (
+            <BookingDetailModal id={record.id} />
+          )}
         </Space>
       ),
       align: 'left'

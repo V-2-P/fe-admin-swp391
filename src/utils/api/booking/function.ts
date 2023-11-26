@@ -8,7 +8,8 @@ const APIs_URL = {
   BOOKING_USERID: (id: number) => `booking/users/${id}`,
   ADD_BIRDPAIRING: `birdparing?bookingDetailId`,
   UPDATE_TRACKING_NUMBER: (id: number) => `booking/${id}`,
-  UPDATE_STATUS_BIRDPAIRING: (id: number, status: string) => `birdparing/${id}/status?status=${status}`
+  UPDATE_STATUS_BIRDPAIRING: (id: number, status: string) => `birdparing/${id}/status?status=${status}`,
+  UPDATE_STATUS_BOOKING_DETAIL: (id: number, status: string) => `/bookingdetail/${id}/status?status=${status}`
 }
 
 export const getBookingByIdAPI = async (id: number) => {
@@ -37,4 +38,8 @@ export const updateTrackingNumberAPI = async (id: number, tracking: string) => {
 
 export const updateStatusPairingAPI = async (id: number, status: string) => {
   return await axiosClient.put(APIs_URL.UPDATE_STATUS_BIRDPAIRING(id, status))
+}
+
+export const updateStatusBookingDeatailAPI = async (id: number, status: string) => {
+  return await axiosClient.put(APIs_URL.UPDATE_STATUS_BOOKING_DETAIL(id, status))
 }

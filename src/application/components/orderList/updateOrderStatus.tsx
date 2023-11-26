@@ -16,7 +16,6 @@ type UpdateOrderStatusProps = {
 }
 
 const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => {
-  const [currentStatus, setCurrentStatus] = useState<OrderStatus | string>(status)
   const [loading, setLoading] = useState<boolean>(false)
   const { notification } = App.useApp()
   const dispatch = useAppDispatch()
@@ -71,7 +70,6 @@ const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => 
         setLoading(false)
         if (response) {
           notification.success({ message: `Cập nhật trạng thái thành công` })
-          setCurrentStatus(e.key)
           dispatch(reFetchData())
         } else {
           notification.error({ message: 'Sorry! Something went wrong. App server error' })
@@ -86,7 +84,6 @@ const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => 
         setLoading(false)
         if (response) {
           notification.success({ message: `Cập nhật trạng thái thành công` })
-          setCurrentStatus(e.key)
           dispatch(reFetchData())
         } else {
           notification.error({ message: 'Sorry! Something went wrong. App server error' })
@@ -97,7 +94,6 @@ const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => 
         setLoading(false)
         if (response) {
           notification.success({ message: `Cập nhật trạng thái thành công` })
-          setCurrentStatus(e.key)
           dispatch(reFetchData())
         } else {
           notification.error({ message: 'Sorry! Something went wrong. App server error' })
@@ -110,8 +106,8 @@ const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => 
   }
   if (status === OrderStatus.delivered || status === OrderStatus.cancelled) {
     return (
-      <Tag bordered={false} color={getOrderStatus(currentStatus).color} className='!w-full !text-center'>
-        {getOrderStatus(currentStatus).name}
+      <Tag bordered={false} color={getOrderStatus(status).color} className='!w-full !text-center'>
+        {getOrderStatus(status).name}
       </Tag>
     )
   }
@@ -123,8 +119,8 @@ const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => 
         placement='bottomRight'
         className='cursor-pointer'
       >
-        <Tag bordered={false} color={getOrderStatus(currentStatus).color} className='!w-full !text-center'>
-          {getOrderStatus(currentStatus).name}
+        <Tag bordered={false} color={getOrderStatus(status).color} className='!w-full !text-center'>
+          {getOrderStatus(status).name}
         </Tag>
       </Dropdown>
     </Spin>
