@@ -6,6 +6,7 @@ const APIs_URL = {
   ORDER_ID: (id: number) => `/orders/${id}`,
   ORDER_PROCESS: (id: number) => `/orders/confirm/${id}`,
   ORDER_DELIVERED: (id: number) => `/orders/delivered/${id}`,
+  ORDER_CANCELLED: (id: number) => `/orders/cancelled/${id}`,
   ORDER_SHIPPING: `/shipments/create-order`,
   ORDER_USERID: (id: number) => `/orders/user/${id}`
 }
@@ -28,6 +29,10 @@ export const updateOrderShippingStatusAPI = async (data: { id: number; strategyT
 
 export const updateOrderDeliveredStatusAPI = async (id: number) => {
   return await axiosClient.put(APIs_URL.ORDER_DELIVERED(id))
+}
+
+export const updateOrderCancelledStatusAPI = async (id: number) => {
+  return await axiosClient.put(APIs_URL.ORDER_CANCELLED(id))
 }
 
 export const getOrderByUserId = async (id: number) => {

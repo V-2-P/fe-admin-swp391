@@ -8,7 +8,6 @@ import {
   TeamOutlined,
   UserOutlined,
   ContainerOutlined,
-  CarOutlined,
   CommentOutlined,
   EditOutlined
 } from '@ant-design/icons'
@@ -57,8 +56,8 @@ const Menu: React.FC = () => {
             // getItem('Giao hàng', '/delivery', <CarOutlined />)
           ]),
           getItem('Quản lý đơn lai chim', 'sub4', <AppstoreOutlined />, [
-            getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />),
-            getItem('Giao hàng', '/bookingdelivery', <CarOutlined />)
+            getItem('Danh sách lai chim', '/bookinglist', <ContainerOutlined />)
+            // getItem('Giao hàng', '/bookingdelivery', <CarOutlined />)
           ]),
           getItem('Quản lý khách hàng', 'sub5', <AppstoreOutlined />, [
             getItem('Danh sách khách hàng', '/customerlist', <TeamOutlined />)

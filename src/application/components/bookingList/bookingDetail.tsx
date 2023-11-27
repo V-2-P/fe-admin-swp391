@@ -26,13 +26,13 @@ const BookingDetailModal: React.FC<BookingDetailButtonType> = ({ id }) => {
   const changeData = (newData: BirdPairing) => {
     setBirdPairings([...birdPairings, newData])
   }
-  const changeStatus = (id: number, status: string) => {
+  const changeStatus = (id: number, data: BirdPairing) => {
     const updatedBirdPairings = [...birdPairings]
-    const birdPairingToUpdate = updatedBirdPairings.find((birdPairing) => birdPairing.id === id)
+    const indexToUpdate = updatedBirdPairings.findIndex((birdPairing) => birdPairing.id === id)
 
     // Nếu tìm thấy phần tử, cập nhật trạng thái của nó
-    if (birdPairingToUpdate) {
-      birdPairingToUpdate.status = status
+    if (indexToUpdate !== -1) {
+      updatedBirdPairings[indexToUpdate] = data
 
       // Cập nhật state với mảng đã cập nhật
       setBirdPairings(updatedBirdPairings)

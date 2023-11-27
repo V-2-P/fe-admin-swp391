@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {
   OrderStatus,
+  updateOrderCancelledStatusAPI,
   updateOrderDeliveredStatusAPI,
   updateOrderProcessingStatusAPI,
   updateOrderShippingStatusAPI
@@ -91,6 +92,16 @@ const UpdateOrderStatus: React.FC<UpdateOrderStatusProps> = ({ status, id }) => 
       }
       if (e.key === OrderStatus.delivered) {
         const response = await updateOrderDeliveredStatusAPI(id)
+        setLoading(false)
+        if (response) {
+          notification.success({ message: `Cập nhật trạng thái thành công` })
+          dispatch(reFetchData())
+        } else {
+          notification.error({ message: 'Sorry! Something went wrong. App server error' })
+        }
+      }
+      if (e.key === OrderStatus.cancelled) {
+        const response = await updateOrderCancelledStatusAPI(id)
         setLoading(false)
         if (response) {
           notification.success({ message: `Cập nhật trạng thái thành công` })

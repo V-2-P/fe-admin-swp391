@@ -49,7 +49,10 @@ export const getOrderStatus = (status: OrderStatus | string): { name: string; co
   return result
 }
 
-export const getBookingStatus = (status: BookingStatus | string): { name: string; color: string } => {
+export const getBookingStatus = (
+  status: BookingStatus | string,
+  status2nd?: string
+): { name: string; color: string } => {
   let result
   switch (status) {
     case BookingStatus.cancelled || BookingStatus.cancelled.toString():
@@ -81,6 +84,30 @@ export const getBookingStatus = (status: BookingStatus | string): { name: string
       }
       break
     case BookingStatus.preparing || BookingStatus.preparing.toString():
+      if (status2nd === 'Fledgling_All') {
+        result = {
+          // name: status.toString().toUpperCase(),
+          name: 'Chờ nhận con',
+          color: 'cyan'
+        }
+        break
+      }
+      if (status2nd === 'Receiving_Confirm') {
+        result = {
+          // name: status.toString().toUpperCase(),
+          name: 'Nhận con',
+          color: 'cyan'
+        }
+        break
+      }
+      if (status2nd === 'Not_Receiving_Confirm') {
+        result = {
+          // name: status.toString().toUpperCase(),
+          name: 'Không nhận con',
+          color: 'cyan'
+        }
+        break
+      }
       result = {
         // name: status.toString().toUpperCase(),
         name: 'Nhận con',

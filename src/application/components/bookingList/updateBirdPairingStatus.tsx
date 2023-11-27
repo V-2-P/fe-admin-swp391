@@ -2,12 +2,12 @@ import { MenuProps, Spin, Tag, Dropdown, App } from 'antd'
 import { useState } from 'react'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 import { reFetchData } from '~/redux/slices'
-import { updateStatusPairingAPI } from '~/utils/api/booking'
+import { BirdPairing, updateStatusPairingAPI } from '~/utils/api/booking'
 
 type UpdateBirdPairingStatusProps = {
   status: string
   id: number
-  changeStatus: (id: number, status: string) => void
+  changeStatus: (id: number, data: BirdPairing) => void
 }
 
 const UpdateBirdPairingStatus: React.FC<UpdateBirdPairingStatusProps> = ({ id, status, changeStatus }) => {
@@ -30,7 +30,7 @@ const UpdateBirdPairingStatus: React.FC<UpdateBirdPairingStatusProps> = ({ id, s
       const response = await updateStatusPairingAPI(id, status)
       if (response) {
         notification.success({ message: 'Cập nhật trạng thái thành công' })
-        changeStatus(id, response.data.status)
+        changeStatus(id, response.data)
         dispatch(reFetchData())
       } else {
         notification.error({ message: 'Sorry! Something went wrong. App server error' })

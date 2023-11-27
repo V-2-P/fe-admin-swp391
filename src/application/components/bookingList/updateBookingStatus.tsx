@@ -3,6 +3,7 @@ import type { MenuProps } from 'antd/lib'
 import React, { useState } from 'react'
 import { useAppDispatch } from '~/application/hooks/reduxHook'
 import { reFetchData } from '~/redux/slices'
+import axiosClient from '~/utils/api/axiosClient'
 import {
   BookingDetail,
   BookingStatus,
@@ -128,6 +129,19 @@ const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id, b
         } else {
           notification.error({ message: 'Sorry! Something went wrong. App server error' })
         }
+      } else if (e === 'Shipping') {
+        const payload = {
+          id: id,
+          strategyType: 'BOOKING'
+        }
+        const response = await axiosClient.post('/shipments/create-order', payload)
+        setLoading(false)
+        if (response) {
+          notification.success({ message: 'Cập nhật trạng thái thành công' })
+          dispatch(reFetchData())
+        } else {
+          notification.error({ message: 'Sorry! Something went wrong. App server error' })
+        }
       } else {
         const response = await updateStatusBookingDeatailAPI(bookingDetail.id, e)
         setLoading(false)
@@ -175,12 +189,27 @@ const UpdateBookingStatus: React.FC<UpdateBookingStatusProps> = ({ status, id, b
       </Spin>
     )
   }
+  if (status === BookingStatus.preparing && bookingDetail.status === 'Fledgling_All') {
+    return (
+      <Tag
+        bordered={false}
+        color={getBookingStatus(status, bookingDetail.status).color}
+        className='!w-full !text-center'
+      >
+        {getBookingStatus(status, bookingDetail.status).name}
+      </Tag>
+    )
+  }
   return (
     <Spin spinning={loading}>
       <Dropdown menu={{ items, onClick }} trigger={['click']} placement='bottomRight' className='cursor-pointer'>
         <a onClick={(e) => e.currentTarget}>
-          <Tag bordered={false} color={getBookingStatus(status).color} className='!w-full !text-center'>
-            {getBookingStatus(status).name}
+          <Tag
+            bordered={false}
+            color={getBookingStatus(status, bookingDetail.status).color}
+            className='!w-full !text-center'
+          >
+            {getBookingStatus(status, bookingDetail.status).name}
           </Tag>
         </a>
       </Dropdown>
