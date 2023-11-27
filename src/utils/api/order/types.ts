@@ -10,7 +10,7 @@ export type Order = {
   userId: number
   fullName: string
   phoneNumber: string
-  shippingAddress: string
+  toAddress: string
   note: string | null
   totalMoney: number
   totalPayment: number

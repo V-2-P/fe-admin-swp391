@@ -26,27 +26,27 @@ const BookingList: React.FC = () => {
   const filterStatus: ColumnFilterItem[] = [
     {
       value: BookingStatus.pending,
-      text: BookingStatus.pending.toUpperCase()
+      text: getBookingStatus(BookingStatus.pending).name
     },
     {
       value: BookingStatus.preparing,
-      text: BookingStatus.preparing.toUpperCase()
+      text: getBookingStatus(BookingStatus.preparing).name
     },
     {
       value: BookingStatus.shipping,
-      text: BookingStatus.shipping.toUpperCase()
+      text: getBookingStatus(BookingStatus.shipping).name
     },
     {
       value: BookingStatus.delivered,
-      text: BookingStatus.delivered.toUpperCase()
+      text: getBookingStatus(BookingStatus.delivered).name
     },
     {
       value: BookingStatus.cancelled,
-      text: BookingStatus.cancelled.toUpperCase()
+      text: getBookingStatus(BookingStatus.cancelled).name
     },
     {
       value: BookingStatus.confirmed,
-      text: BookingStatus.confirmed.toUpperCase()
+      text: getBookingStatus(BookingStatus.confirmed).name
     }
   ]
   const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Booking> => ({
@@ -172,11 +172,11 @@ const BookingList: React.FC = () => {
       width: '15%',
       render: (_, record) => (
         <Space size='middle'>
-          {record.status === BookingStatus.confirmed && record.bookingDetail.status === 'Waiting' ? (
+          {record.status === BookingStatus.confirmed && record.bookingDetail.status === 'Waiting' && (
             <ConfirmButton id={record.bookingDetail.id} />
-          ) : (
-            <BookingDetailModal id={record.id} />
           )}
+
+          <BookingDetailModal id={record.id} />
         </Space>
       ),
       align: 'left'

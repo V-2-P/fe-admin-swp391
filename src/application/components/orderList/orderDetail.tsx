@@ -41,44 +41,61 @@ const OrderDetailButton: React.FC<OrderDetailButtonType> = ({ id }) => {
     status: 'process',
     current: 1
   })
-  const stepItems: StepProps[] = [
-    {
-      title: orderStep.current > 0 ? 'Đã xác nhận' : 'Chờ xác nhận',
-      icon:
-        orderStep.current === 0 && orderStep.status === 'error' ? null : (
-          <Popover content={<span>Aug 12, 2023 05.03am</span>}>
-            <ShoppingCartOutlined />
-          </Popover>
-        )
-    },
-    {
-      title: orderStep.current === 1 ? 'Đang xử lý' : orderStep.current > 1 ? 'Đã xử lý' : 'Chờ xử lý',
-      icon:
-        orderStep.current === 1 && orderStep.status === 'error' ? null : (
-          <Popover content={<span>Aug 12, 2023 05.03am</span>}>
-            <InboxOutlined />
-          </Popover>
-        )
-    },
-    {
-      title: orderStep.current === 2 ? 'Đang vận chuyển' : orderStep.current > 2 ? 'Đã vận chuyển' : 'Chờ vận chuyển',
-      icon:
-        orderStep.current === 2 && orderStep.status === 'error' ? null : (
-          <Popover content={<span>Aug 12, 2023 05.03am</span>}>
-            <CarOutlined />
-          </Popover>
-        )
-    },
-    {
-      title: orderStep.current === 3 ? 'Đang giao hàng' : orderStep.current > 3 ? 'Đã giao hàng' : 'Chờ giao hàng',
-      icon:
-        orderStep.current === 3 && orderStep.status === 'error' ? null : (
-          <Popover content={<span>Aug 12, 2023 05.03am</span>}>
-            <CarryOutOutlined />
-          </Popover>
-        )
-    }
-  ]
+  const stepItems: StepProps[] =
+    orderStep.status !== 'error'
+      ? [
+          {
+            title: orderStep.current > 0 ? 'Đã xác nhận' : 'Chờ xác nhận',
+            icon: (
+              <Popover content={<span>Aug 12, 2023 05.03am</span>}>
+                <ShoppingCartOutlined />
+              </Popover>
+            )
+          },
+          {
+            title: orderStep.current === 1 ? 'Đang xử lý' : orderStep.current > 1 ? 'Đã xử lý' : 'Chờ xử lý',
+            icon: (
+              <Popover content={<span>Aug 12, 2023 05.03am</span>}>
+                <InboxOutlined />
+              </Popover>
+            )
+          },
+          {
+            title:
+              orderStep.current === 2 ? 'Đang vận chuyển' : orderStep.current > 2 ? 'Đã vận chuyển' : 'Chờ vận chuyển',
+            icon: (
+              <Popover content={<span>Aug 12, 2023 05.03am</span>}>
+                <CarOutlined />
+              </Popover>
+            )
+          },
+          {
+            title:
+              orderStep.current === 3 ? 'Đang giao hàng' : orderStep.current > 3 ? 'Đã giao hàng' : 'Chờ giao hàng',
+            icon: (
+              <Popover content={<span>Aug 12, 2023 05.03am</span>}>
+                <CarryOutOutlined />
+              </Popover>
+            )
+          }
+        ]
+      : [
+          {
+            title: orderStep.current > 0 ? 'Đã xác nhận' : 'Chờ xác nhận',
+            icon: orderStep.current === 0 && orderStep.status === 'error' ? null : <ShoppingCartOutlined />
+          },
+          {
+            title:
+              orderStep.status === 'error'
+                ? 'Đã hủy'
+                : orderStep.current === 1
+                ? 'Đang xử lý'
+                : orderStep.current > 1
+                ? 'Đã xử lý'
+                : 'Chờ xử lý',
+            icon: orderStep.current === 1 && orderStep.status === 'error' ? null : <InboxOutlined />
+          }
+        ]
   const orderColumns: ColumnsType<OrderDetail> = [
     {
       title: 'Sản phẩm',
@@ -116,7 +133,7 @@ const OrderDetailButton: React.FC<OrderDetailButtonType> = ({ id }) => {
     {
       key: '2',
       label: 'Địa chỉ',
-      children: data?.shippingAddress,
+      children: data?.toAddress,
       span: 3
     },
     {
@@ -176,6 +193,11 @@ const OrderDetailButton: React.FC<OrderDetailButtonType> = ({ id }) => {
           setOrderStep({
             status: 'process',
             current: 3
+          })
+        } else if (status == OrderStatus.cancelled) {
+          setOrderStep({
+            status: 'error',
+            current: 1
           })
         }
       } else {

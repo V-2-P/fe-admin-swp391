@@ -54,23 +54,23 @@ const OrderList: React.FC = () => {
   const filterStatus: ColumnFilterItem[] = [
     {
       value: OrderStatus.cancelled,
-      text: OrderStatus.cancelled.toUpperCase()
+      text: getOrderStatus(OrderStatus.cancelled).name
     },
     {
       value: OrderStatus.delivered,
-      text: OrderStatus.delivered.toUpperCase()
+      text: getOrderStatus(OrderStatus.delivered).name
     },
     {
       value: OrderStatus.pending,
-      text: OrderStatus.pending.toUpperCase()
+      text: getOrderStatus(OrderStatus.pending).name
     },
     {
       value: OrderStatus.processing,
-      text: OrderStatus.processing.toUpperCase()
+      text: getOrderStatus(OrderStatus.processing).name
     },
     {
       value: OrderStatus.shipping,
-      text: OrderStatus.shipping.toUpperCase()
+      text: getOrderStatus(OrderStatus.shipping).name
     }
   ]
 
